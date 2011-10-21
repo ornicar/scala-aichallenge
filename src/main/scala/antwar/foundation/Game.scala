@@ -1,9 +1,13 @@
+package antwar.foundation
+
 import scala.math.{abs,min,pow}
 
 case class GameInProgress(turn: Int = 0, parameters: GameParameters = GameParameters(), board: Board = Board()) extends Game {
   val gameOver = false
   def including[P <: Positionable](positionable: P) = this.copy(board = this.board including positionable)
   def including(p: Positionable*): GameInProgress = p.foldLeft(this){(game, positionable) => game.including(positionable)}
+
+  def moving(from: Tile, to: Tile): GameInProgress = copy(board = board.moving(from, to))
 }
 case class GameOver(turn: Int = 0, parameters: GameParameters = GameParameters(), board: Board = Board()) extends Game {
   val gameOver = true
@@ -16,10 +20,10 @@ sealed trait Game {
   val gameOver: Boolean
 
   def distanceFrom(one: Tile) = new {
-    def to(another: Tile) = {
+    def to(another: Tile): Int = {
       val dRow = abs(one.row - another.row)
       val dCol = abs(one.column - another.column)
-      pow(min(dRow, parameters.rows - dRow), 2) + pow(min(dCol, parameters.columns - dCol), 2)
+      dRow + dCol
     }
   }
 
@@ -50,6 +54,26 @@ sealed trait Game {
         case West => tile.copy(column = if (tile.column == 0) parameters.columns - 1 else tile.column - 1)
       }
     }
+  }
+
+  def choices(tile: Tile) =
+    CardinalPoint.all filter { aim => free(this tile aim of tile) }
+
+  def free(tile: Tile) = !(board.myAnts contains tile) && !(board.water contains tile)
+
+  def nearest[A <: Positionable](objs: Iterable[A]) = new {
+    def from(tile: Tile): Option[A] = Proximity.sorted(objs, tile).headOption map (_.obj)
+  }
+
+  private case class Proximity[+A <: Positionable](obj: A, dist: Int)
+
+  private object Proximity {
+
+    def apply[A <: Positionable](obj: A, tile: Tile): Proximity[A] =
+      Proximity(obj, (Game.this distanceFrom obj.tile to tile))
+
+    def sorted[A <: Positionable](objs: Iterable[A], tile: Tile): Seq[Proximity[A]] =
+      (objs map { apply(_, tile) }).toSeq sortWith { (a, b) => a.dist < b.dist }
   }
 }
 

@@ -1,3 +1,4 @@
+package antwar.foundation
 
 sealed trait Positionable {
   val tile: Tile

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-scala -classpath target/scala-2.9.1/classes: MyBot $*
+scala -classpath target/scala-2.9.1/classes: antwar.OrnicarBot $*

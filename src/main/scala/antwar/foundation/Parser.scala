@@ -1,3 +1,5 @@
+package antwar.foundation
+
 import annotation.tailrec
 import io.Source
 import util.matching.Regex

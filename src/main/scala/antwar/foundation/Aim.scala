@@ -1,3 +1,5 @@
+package antwar.foundation
+
 sealed trait CardinalPoint {
   val symbol: Char
 }
@@ -16,6 +18,7 @@ case object West extends CardinalPoint {
 }
 
 object CardinalPoint {
+  def all = List(North, East, South, West)
   def oppositeOf[P <: CardinalPoint](p: P) = {
     p match {
       case North => South
