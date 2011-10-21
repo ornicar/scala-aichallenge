@@ -1,3 +1,5 @@
+import scala.util.Random
+
 object MyBot extends App {
   new AntsGame().run(new MyBot)
 }
@@ -6,19 +8,23 @@ class MyBot extends Bot {
 
   def ordersFrom(game: Game): Set[Order] = {
 
-    // Your logic goes here.
-    // for example ...
-
     val directions = List(North, East, South, West)
-    val ants = game.board.myAnts.values
-    ants.flatMap{ant =>
-      // for this ant, find the first direction which is not water, if any
-      val direction = directions.find{aim =>
-        val targetTile = game.tile(aim).of(ant.tile)
-        !game.board.water.contains(targetTile)
+
+    def antDirection(ant: MyAnt, occupied: Set[Tile]): Option[CardinalPoint] = {
+
+      def canGo(tile: Tile) = !(game.board.water contains tile) && !(occupied contains tile)
+
+      Random.shuffle(directions) find { dir => canGo(game tile dir of ant.tile) }
+    }
+
+    def recursiveOrders(ants: List[MyAnt], occupied: Set[Tile] = Set()): Set[Order] = ants match {
+      case Nil => Set()
+      case ant :: otherAnts => antDirection(ant, occupied) match {
+        case None => recursiveOrders(otherAnts, occupied)
+        case Some(dir) => recursiveOrders(otherAnts, occupied + game.tile(dir).of(ant.tile)) + Order(ant.tile, dir)
       }
-      // convert this (possible) direction into an order for this ant
-      direction.map{d => Order(ant.tile, d)}
-    }.toSet
+    }
+
+    recursiveOrders(game.board.myAnts.values.toList)
   }
 }
