@@ -1,12 +1,13 @@
 package antwar.foundation
 
+import antwar.Memory
 import annotation.tailrec
 import io.Source
 import util.matching.Regex
 
 object Parser {
 
-  def parse(source: Source, params: GameParameters = GameParameters(), knownWater: Map[Tile, Water] = Map.empty) = {
+  def parse(source: Source, params: GameParameters, knownWater: Map[Tile, Water], memory: Memory) = {
     val lines = source.getLines
 
     def parseInternal(state: GameInProgress): Game = {
@@ -14,7 +15,7 @@ object Parser {
       line match {
         case "" => parseInternal(state)
         case "go" | "ready" => state
-        case "end" => GameOver(turn = state.turn, parameters = state.parameters, board = state.board)
+        case "end" => GameOver(turn = state.turn, parameters = state.parameters, board = state.board, memory = state.memory)
         case _ => {
           regularExpressions.find{case(regex, _) => line.matches(regex.toString)}.map{case(regex, f) =>
             val regex(value) = line
@@ -25,7 +26,7 @@ object Parser {
       }
     }
 
-    parseInternal(GameInProgress(parameters = params, board = Board(water = knownWater)))
+    parseInternal(GameInProgress(parameters = params, board = Board(water = knownWater), memory = memory))
   }
 
   // The sequence of these is important. The parser will invoke the first that matches.

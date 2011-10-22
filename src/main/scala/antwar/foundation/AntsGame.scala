@@ -1,5 +1,7 @@
 package antwar.foundation
 
+import antwar._
+
 import annotation.tailrec
 import io.Source
 import java.io._
@@ -13,14 +15,24 @@ class AntsGame(in: InputStream = System.in, out: OutputStream = System.out) {
     try {
 
       def playNextTurn(game: Game): Unit = {
-        val newGameState = Parser.parse(source, game.parameters, game.board.water)
-        if (newGameState.gameOver) Unit
-        else {
-          val orders = bot.ordersFrom(newGameState)
-          orders.map(_.inServerSpeak).foreach(writer.write)
-          writer.write("go\n")
-          writer.flush
-          playNextTurn(newGameState)
+        Parser.parse(source, game.parameters, game.board.water, game.memory) match {
+          case g: GameOver => Unit
+          case g: GameInProgress => {
+            val timer = new Timer
+            // first time, we have to replace the empty memory with a game memory
+            val memory = g.memory match {
+              case _: EmptyMemory => Memory(g)
+              case x: GameMemory => x
+            }
+            // apply game vision to game memory
+            val game = g.copy(memory = memory seeing g.vision)
+            val orders = bot.ordersFrom(game)
+            orders.map(_.inServerSpeak).foreach(writer.write)
+            println(timer.toString)
+            writer.write("go\n")
+            writer.flush
+            playNextTurn(game)
+          }
         }
       }
       playNextTurn(GameInProgress())
@@ -30,4 +42,8 @@ class AntsGame(in: InputStream = System.in, out: OutputStream = System.out) {
     }
   }
 
+  def log(file: String = "/tmp/antwarslog")(op: PrintWriter => Unit) {
+    val p = new PrintWriter(new File(file))
+    try { op(p) } finally { p.close() }
+  }
 }

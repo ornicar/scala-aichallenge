@@ -1,5 +1,8 @@
 package antwar.foundation
 
+import antwar.Memory
+
 trait Bot {
-  def ordersFrom(gameState: Game): Set[Order]
+
+  def ordersFrom(game: Game): Set[Order]
 }

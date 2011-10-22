@@ -13,9 +13,4 @@ object AntwarBuild extends Build
       "org.scalatest" % "scalatest_2.9.0" % "1.6.1"
     )
   )
-
-  // append -deprecation to the options passed to the Scala compiler
-  scalacOptions += "-deprecation"
-
-  scalacOptions += "-unchecked"
 }

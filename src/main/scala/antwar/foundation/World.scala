@@ -1,22 +1,14 @@
 package antwar.foundation
 
-import scala.math.{abs,min,pow}
+import scala.math.{abs,min,pow,sqrt}
 
 case class World(rows: Int, columns: Int) {
 
   def distanceFrom(one: Tile) = new {
     def to(other: Tile): Double = {
-      val dRow = abs(one.row - other.row)
       val dCol = abs(one.column - other.column)
-      pow(min(dRow, rows - dRow), 2) + pow(min(dCol, columns - dCol), 2)
-    }
-  }
-
-  def walkingDistanceFrom(one: Tile) = new {
-    def to(other: Tile): Int = {
       val dRow = abs(one.row - other.row)
-      val dCol = abs(one.column - other.column)
-      dRow + dCol
+      min(dCol, columns - dCol) + min(dRow, columns - dRow)
     }
   }
 
