@@ -2,27 +2,22 @@ package antwar
 
 import foundation._
 
-case class PathFinder(game: Game) extends TileSystem {
+case class PathFinder(game: Game) {
 
-  val columns: Int = game.columns
-  val rows: Int = game.rows
+  def world = game.world
 
   def from(f: Tile) = new {
     def to(t: Tile): Path = {
-      Path(Seq())
+      val dRow = t.row - f.row
+      val dCol = t.column - f.column
+      def dirDistanceToList(dirDist: Option[(CardinalPoint, Int)]): List[CardinalPoint] = dirDist match {
+        case None => Nil
+        case Some((dir, dist)) => List.fill(dist)(dir)
+      }
+      val aims = dirDistanceToList(world.nsDistance(f, t)) ::: dirDistanceToList(world.ewDistance(f, t))
+      //val directPaths = directPath.permutations
+      Path(world, aims, f)
     }
   }
 
-  def showPath(path: Path): String = path.tiles match {
-    case Nil => ""
-    case tiles => ((tiles.head, "") /: tiles.tail) { case ((prev, str), t) =>
-      (t, (this directionFrom prev to t).head.symbol + str)
-    }._2
-  }
-
-}
-
-case class Path(tiles: Seq[Tile]) {
-
-  val size = tiles.size
 }

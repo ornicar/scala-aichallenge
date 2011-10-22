@@ -11,18 +11,17 @@ case class GameOver(turn: Int = 0, parameters: GameParameters = GameParameters()
   val gameOver = true
 }
 
-sealed trait Game extends TileSystem {
+sealed trait Game {
   val turn: Int
   val parameters: GameParameters
-  val rows: Int = parameters.rows
-  val columns: Int = parameters.columns
   val board: Board
   val gameOver: Boolean
+  val world = World(parameters.rows, parameters.columns)
 
   def free(tile: Tile) = !(board.myAnts contains tile) && !(board.water contains tile)
 
   def choices(tile: Tile) =
-    CardinalPoint.all filter { aim => free(this tile aim of tile) }
+    CardinalPoint.all filter { aim => free(world tile aim of tile) }
 
   def nearest[A <: Positionable](objs: Iterable[A]) = new {
     def from(tile: Tile): Option[A] = Proximity.sorted(objs, tile).headOption map (_.obj)
@@ -33,10 +32,9 @@ sealed trait Game extends TileSystem {
   private object Proximity {
 
     def apply[A <: Positionable](obj: A, tile: Tile): Proximity[A] =
-      Proximity(obj, (Game.this walkingDistanceFrom obj.tile to tile))
+      Proximity(obj, (world walkingDistanceFrom obj.tile to tile))
 
     def sorted[A <: Positionable](objs: Iterable[A], tile: Tile): Seq[Proximity[A]] =
       (objs map { apply(_, tile) }).toSeq sortWith { (a, b) => a.dist < b.dist }
   }
 }
-

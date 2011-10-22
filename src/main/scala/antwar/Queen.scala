@@ -15,7 +15,7 @@ class Queen(game: GameInProgress) {
         aim match {
           case None => recursiveOrders(rest, game)
           case Some(aim) => {
-            val newGame = game.moving(assignement.ant, game tile aim of assignement.ant)
+            val newGame = game.moving(assignement.ant, game.world tile aim of assignement.ant)
             recursiveOrders(rest, newGame) + Order(assignement.ant, aim)
           }
         }
