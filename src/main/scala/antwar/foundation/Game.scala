@@ -22,19 +22,4 @@ sealed trait Game {
 
   def choices(tile: Tile) =
     CardinalPoint.all filter { aim => free(world tile aim of tile) }
-
-  def nearest[A <: Positionable](objs: Iterable[A]) = new {
-    def from(tile: Tile): Option[A] = Proximity.sorted(objs, tile).headOption map (_.obj)
-  }
-
-  private case class Proximity[+A <: Positionable](obj: A, dist: Int)
-
-  private object Proximity {
-
-    def apply[A <: Positionable](obj: A, tile: Tile): Proximity[A] =
-      Proximity(obj, (world walkingDistanceFrom obj.tile to tile))
-
-    def sorted[A <: Positionable](objs: Iterable[A], tile: Tile): Seq[Proximity[A]] =
-      (objs map { apply(_, tile) }).toSeq sortWith { (a, b) => a.dist < b.dist }
-  }
 }

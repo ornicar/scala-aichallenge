@@ -10,6 +10,8 @@ sealed trait Path {
 
   def from: Tile
 
+  def size: Int
+
   def to: Tile = tiles.last
 
   def trip = tiles.tail.init
@@ -26,12 +28,15 @@ final class TilePath(world: World, val tiles: List[Tile]) extends Path {
   lazy val aims = ((tiles.head, List[CardinalPoint]()) /: tiles.tail) { case ((prevTile, aims), tile) =>
     (tile, world.singleDirection(prevTile, tile) :: aims)
   }._2.reverse
+
+  lazy val size = aims.size
 }
 
 final class AimPath(world: World, val aims: List[CardinalPoint], val from: Tile) extends Path {
 
   lazy val tiles = (List(from) /: aims) { case (ts, aim) => (world tile aim of ts.head) :: ts }.reverse
 
+  lazy val size = tiles.size - 1
 }
 
 object Path {

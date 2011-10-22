@@ -17,10 +17,7 @@ case class Explore() extends Job {
 
 trait Goto extends Job {
 
-  def aim(ant: MyAnt, game: Game) = (game.world directionFrom ant to target).head match {
-    case aim if game choices ant contains aim => Some(aim)
-    case _ => any(game choices ant)
-  }
+  def aim(ant: MyAnt, game: Game) = PathFinder(game) from ant to target map { _.aims.first }
 
   def target: Tile
 }
