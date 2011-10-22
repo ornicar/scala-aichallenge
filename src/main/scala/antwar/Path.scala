@@ -12,7 +12,11 @@ sealed trait Path {
 
   def to: Tile = tiles.last
 
+  def trip = tiles.tail.init
+
   override def toString: String = aims mkString ", "
+
+  def compactString: String = aims map (_.symbol) mkString ""
 }
 
 final class TilePath(world: World, val tiles: List[Tile]) extends Path {
