@@ -1,6 +1,6 @@
 package antwar
 
-import antwar.foundation._
+import foundation._
 
 object OrnicarBot extends App {
   new AntsGame().run(new OrnicarBot)

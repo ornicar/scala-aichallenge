@@ -1,6 +1,6 @@
 package antwar
 
-import antwar.foundation._
+import foundation._
 
 import scala.util.Random
 
@@ -15,16 +15,16 @@ class Queen(game: GameInProgress) {
         aim match {
           case None => recursiveOrders(rest, game)
           case Some(aim) => {
-            val newGame = game.moving(assignement.tile, game tile aim of assignement.tile)
-            recursiveOrders(rest, newGame) + Order(assignement.tile, aim)
+            val newGame = game.moving(assignement.ant, game tile aim of assignement.ant)
+            recursiveOrders(rest, newGame) + Order(assignement.ant, aim)
           }
         }
       }
     }
-    recursiveOrders(assignements.toList, game)
+    recursiveOrders(assignements, game)
   }
 
-  def assignements: Set[Assignement] = (new Assigner(game.board)).distribute
+  def assignements: List[Assignement] = (new Assigner(game)).distribute
 
   def canGo(tile: Tile, occupied: Set[Tile]) = !(game.board.water contains tile) && !(occupied contains tile)
 }

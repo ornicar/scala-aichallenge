@@ -1,6 +1,6 @@
 package antwar
 
-import antwar.foundation._
+import foundation._
 
 case class Memory(age: Int, tiles: List[Tile]) {
 

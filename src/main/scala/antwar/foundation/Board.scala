@@ -9,6 +9,7 @@ case class Board(myAnts: Map[Tile, MyAnt] = Map(),
   lazy val elements = myAnts ++ enemyAnts ++ water ++ food ++ corpses
 
   lazy val myAntSet = myAnts.values.toSet
+  lazy val foodList = food.values.toList
 
   def including[P <: Positionable](positionable: P) = positionable match {
       case friend: MyAnt => this.copy(myAnts = this.myAnts.updated(friend.tile, friend))
