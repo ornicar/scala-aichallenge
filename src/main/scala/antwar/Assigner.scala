@@ -14,7 +14,6 @@ class Assigner(game: Game) {
     val t = Timer("assignement")
     val feeders = electFeeders(ants, foods)
     val explorers = electExplorers(idle(ants, feeders))
-    println("distribute %d feeders & %d explorers" format (feeders.size, explorers.size))
 
     val assignements = feeders.toList ::: explorers.toList
     t.print
@@ -30,7 +29,6 @@ class Assigner(game: Game) {
     case (ants, food :: otherFoods) => this nearest ants.toSeq from food match {
       case None => electFeeders(ants, otherFoods)
       case Some(ant) => {
-        println("ant %s near from food %s (rest %d foods)" format (ant, food, otherFoods.size))
         electFeeders(ants - ant, otherFoods) + Assignement(ant, GetFood(food))
       }
     }

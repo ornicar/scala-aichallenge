@@ -11,6 +11,8 @@ class AntsGame(in: InputStream = System.in, out: OutputStream = System.out) {
   val source = new BufferedSource(in, Source.DefaultBufSize)
   val writer = new BufferedWriter(new OutputStreamWriter(out))
 
+  Logger.clear
+
   def run(bot: Bot) = {
     try {
 
@@ -40,10 +42,5 @@ class AntsGame(in: InputStream = System.in, out: OutputStream = System.out) {
     } catch {
       case t => t.printStackTrace
     }
-  }
-
-  def log(file: String = "/tmp/antwarslog")(op: PrintWriter => Unit) {
-    val p = new PrintWriter(new File(file))
-    try { op(p) } finally { p.close() }
   }
 }

@@ -19,7 +19,6 @@ class Queen(game: GameInProgress) {
         }
       }
     }
-    println("%d tiles, %d vision, %d unseen".format(game.tiles.size, game.vision.size, game.memory.unseen.size))
     recursiveOrders(assignements, game)
   }
 

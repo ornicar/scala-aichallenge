@@ -23,6 +23,8 @@ sealed trait Game {
   val memory: Memory
   val world = World(parameters.rows, parameters.columns)
 
+  Logger("create game")(turn + " " + parameters.rows)
+
   def free(tile: Tile) = !(board.myAnts contains tile) && !(board.water contains tile)
 
   def choices(tile: Tile) =
