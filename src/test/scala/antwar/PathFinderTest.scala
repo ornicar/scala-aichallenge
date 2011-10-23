@@ -27,7 +27,7 @@ abstract class PathFinderTest extends FunSuite {
     val water = find('w', tile => Water(tile))
     val myAnts = find('a', tile => MyAnt(tile))
     val food = find('f', tile => Food(tile))
-    val game = GameInProgress(board = Board(water = water, myAnts = myAnts, food = food))
+    val game = Game(board = Board(water = water, myAnts = myAnts, food = food))
     Scene(game, myAnts.values.head, food.values.head)
   }
 

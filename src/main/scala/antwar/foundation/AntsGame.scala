@@ -20,7 +20,7 @@ class AntsGame(in: InputStream = System.in, out: OutputStream = System.out) {
     Logger.info("Running")
 
     @tailrec
-    def turn(game: GameInProgress) {
+    def turn(game: Game) {
       val t = Timer("ALL")
       val orders = bot ordersFrom game
       t.log

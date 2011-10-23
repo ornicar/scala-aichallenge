@@ -2,11 +2,11 @@ package antwar
 
 import foundation._
 
-class Queen(game: GameInProgress) {
+class Queen(game: Game) {
 
   // get orders for all ants
   def orders: Set[Order] = {
-    def recursiveOrders(assignements: List[Assignement], game: GameInProgress): Set[Order] = assignements match {
+    def recursiveOrders(assignements: List[Assignement], game: Game): Set[Order] = assignements match {
       case Nil => Set()
       case assignement :: rest => {
         val aim = assignement aim game

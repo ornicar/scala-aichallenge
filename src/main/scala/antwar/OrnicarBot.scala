@@ -9,7 +9,7 @@ object OrnicarBot extends App {
 class OrnicarBot extends Bot {
 
   def ordersFrom(game: Game): Set[Order] = game match {
-    case g: GameInProgress => (new Queen(g)).orders
+    case g: Game => (new Queen(g)).orders
     case _ => sys.error("Game finished. Bummer.")
   }
 }

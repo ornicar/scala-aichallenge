@@ -1,25 +1,21 @@
 package antwar.foundation
 
 import antwar.Memory
-
 import scala.math
-
-case class GameSetup(parameters: GameParameters, memory: Memory) extends GameLike
-
-case class GameInProgress(turn: Int, parameters: GameParameters, board: Board, memory: Memory) extends Game {
-
-  def moving(from: Tile, to: Tile): GameInProgress = copy(board = board.moving(from, to))
-}
 
 sealed trait GameLike {
   val parameters: GameParameters
   val memory: Memory
 }
 
-sealed trait Game extends GameLike {
-  val turn: Int
-  val board: Board
+case class GameSetup(parameters: GameParameters, memory: Memory) extends GameLike
+
+case class Game(turn: Int, parameters: GameParameters, board: Board, memory: Memory) extends GameLike {
+
+  Logger("create game")(turn)
+
   lazy val world = World(parameters.rows, parameters.cols)
+
   lazy val tiles: List[Tile] = {
     for {
       row <- (0 to parameters.rows -1)
@@ -27,7 +23,7 @@ sealed trait Game extends GameLike {
     } yield Tile(row, col)
   }.toList
 
-  Logger("create game")(turn)
+  def moving(from: Tile, to: Tile): Game = copy(board = board.moving(from, to))
 
   def free(tile: Tile) = !(board.myAnts contains tile) && !(board.water contains tile)
 
@@ -38,6 +34,7 @@ sealed trait Game extends GameLike {
 
   // All tiles actually visibles
   lazy val vision: Set[Tile] = {
+    Logger.info("process vision")
     import parameters._
     // precalculate squares around an ant to set as visible
     val mx = math.sqrt(viewRadius).toInt

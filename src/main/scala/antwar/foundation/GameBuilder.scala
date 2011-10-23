@@ -5,7 +5,7 @@ import scala.collection.mutable
 
 class GameBuilder {
 
-  def makeGame(lines: List[String], from: GameLike): Option[GameInProgress] = {
+  def makeGame(lines: List[String], from: GameLike): Option[Game] = {
 
     if (lines.head == "end") return None
 
@@ -46,7 +46,7 @@ class GameBuilder {
 
     val board = Board(myAnts, enemyAnts, water, food)
 
-    Some(GameInProgress(turn, from.parameters, board, from.memory))
+    Some(Game(turn, from.parameters, board, from.memory))
   }
 
   def makeGameSetup(lines: List[String]): GameSetup = {
