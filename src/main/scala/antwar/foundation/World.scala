@@ -6,9 +6,9 @@ case class World(rows: Int, cols: Int) {
 
   def distanceFrom(one: Tile) = new {
     def to(other: Tile): Double = {
-      val dCol = abs(one.col - other.col)
       val dRow = abs(one.row - other.row)
-      min(dCol, cols - dCol) + min(dRow, cols - dRow)
+      val dCol = abs(one.col - other.col)
+      min(dRow, cols - dRow) + min(dCol, cols - dCol)
     }
   }
 
@@ -34,11 +34,15 @@ case class World(rows: Int, cols: Int) {
   def singleDirection(one: Tile, other: Tile): Option[CardinalPoint] =
     nsDirection(one, other) orElse ewDirection(one, other)
 
-  def nsDistance(one: Tile, other: Tile): Option[(CardinalPoint, Int)] =
-    nsDirection(one, other) map { (_, abs(one.row - other.row)) }
+  def nsDistance(one: Tile, other: Tile): Option[(CardinalPoint, Int)] = {
+    val dist = abs(one.row - other.row)
+    nsDirection(one, other) map { (_, min(dist, rows - dist)) }
+  }
 
-  def ewDistance(one: Tile, other: Tile): Option[(CardinalPoint, Int)] =
-    ewDirection(one, other) map { (_, abs(one.col - other.col)) }
+  def ewDistance(one: Tile, other: Tile): Option[(CardinalPoint, Int)] = {
+    val dist = abs(one.col - other.col)
+    ewDirection(one, other) map { (_, min(dist, cols - dist)) }
+  }
 
   def tile(aim: CardinalPoint) = new {
     def of(tile: Tile) = {

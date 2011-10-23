@@ -5,17 +5,19 @@ import org.scalatest._
 
 class PathFinderDesertTest extends PathFinderTest {
 
+  val extendWorld = true
+
   test("Find straight east path") {
-    val path = findPath("""wwwwww
-                           .a...f
-                           wwwwww""")
+    val path = findPath("""wwwwwww
+                           w.a...f
+                           wwwwwww""")
     assert(path === "eeee")
   }
 
   test("Find straight west path") {
-    val path = findPath("""wwwwww
-                           .f...a
-                           wwwwww""")
+    val path = findPath("""wwwwwww
+                           .f...aw
+                           wwwwwww""")
     assert(path === "wwww")
   }
 
@@ -23,12 +25,14 @@ class PathFinderDesertTest extends PathFinderTest {
     val path = findPath("""w.f..w
                            w....w
                            w....w
-                           w.a..w""")
+                           w.a..w
+                           wwwwww""")
     assert(path === "nnn")
   }
 
   test("Find straight south path") {
-    val path = findPath("""w.a..w
+    val path = findPath("""wwwwww
+                           w.a..w
                            w....w
                            w....w
                            w.f..w""")
@@ -36,18 +40,22 @@ class PathFinderDesertTest extends PathFinderTest {
   }
 
   test("Find north-east diagonal") {
-    val path = findPath("""w...fw
+    val path = findPath("""wwwwww
+                           w...fw
                            w....w
                            w....w
-                           wa...w""")
+                           wa...w
+                           wwwwww""")
     assert(path === "nnneee")
   }
 
   test("Find south-west diagonal") {
-    val path = findPath("""w...aw
+    val path = findPath("""wwwwww
+                           w...aw
                            w....w
                            w....w
-                           wf...w""")
+                           wf...w
+                           wwwwww""")
     assert(path === "ssswww")
   }
 }

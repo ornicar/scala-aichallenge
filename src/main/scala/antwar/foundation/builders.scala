@@ -42,13 +42,13 @@ class GameBuilder(parameters: GameParameters) extends Builder {
     val enemyAnts = mutable.ListBuffer[Tile]()
 
     def tile(str: String): Tile = str match {
-      case tileRegex(row, col) => Tile(col.toInt, row.toInt)
+      case tileRegex(row, col) => Tile(row.toInt, col.toInt)
     }
 
     def ant(str: String): Either[Tile, Tile] = str match {
       case antRegex(row, col, player) => player.toInt match {
-        case 0 => Left(Tile(col.toInt, row.toInt))
-        case _ => Right(Tile(col.toInt, row.toInt))
+        case 0 => Left(Tile(row.toInt, col.toInt))
+        case _ => Right(Tile(row.toInt, col.toInt))
       }
     }
 
@@ -64,7 +64,8 @@ class GameBuilder(parameters: GameParameters) extends Builder {
       case ("d", x) => // TODO dead
     }
 
-    val board = Board(myAnts.toList, enemyAnts.toList, allWater.toList, food.toList)
+    val allWater = water.toList ::: from.knownWater
+    val board = Board(myAnts.toList, enemyAnts.toList, allWater, food.toList)
     val vision = makeVision(board)
     val memory = from.memory seeing vision
 

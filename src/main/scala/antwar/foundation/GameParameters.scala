@@ -13,14 +13,14 @@ case class GameParameters(loadTime: Int,
 
 object GameParameters {
 
-  def dummy: GameParameters = {
+  def dummy(rows: Int = 50, cols: Int = 50): GameParameters = {
 
-    val tiles = (for { row <- (0 to 50 -1); col <- (0 to 50 -1) } yield Tile(row, col)).toSet
+    val tiles = (for { row <- (0 to rows -1); col <- (0 to cols -1) } yield Tile(row, col)).toSet
 
     GameParameters(loadTime = 2000,
                     turnTime = 1000,
-                    rows = 50,
-                    cols = 50,
+                    rows = rows,
+                    cols = cols,
                     seed = 42,
                     turns = 200,
                     viewRadius = 55,

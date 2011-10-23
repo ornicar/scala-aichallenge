@@ -6,6 +6,8 @@ import org.scalatest._
 
 abstract class PathFinderTest extends FunSuite {
 
+  val extendWorld: Boolean
+
   protected def findPath(str: String): String = {
     val s = makeScene(str)
     val finder = PathFinder(s.game)
@@ -15,26 +17,33 @@ abstract class PathFinderTest extends FunSuite {
 
   protected def makeScene(str: String): Scene = {
 
+    val lines = str.lines.toList
+
     def find[A <: Positionable](symbol: Char): List[Tile] = {
       for {
-        (line, row) <- (str.lines map (_.trim)).zipWithIndex
+        (line, row) <- (lines map (_.trim)).zipWithIndex
         (char, col) <- line.zipWithIndex
         if (char == symbol)
-      } yield Tile(col, row)
+      } yield Tile(row, col)
     }.toList
 
-    val game = makeGame(Board(water = find('w'), myAnts = find('a'), enemyAnts = find('e'), food = find('f')))
+    val rows = if (extendWorld) lines.size + 20 else lines.size
+    val cols = if (extendWorld) lines.head.size + 20 else lines.head.size
+
+    val board = Board(water = find('w'), myAnts = find('a'), enemyAnts = find('e'), food = find('f'))
+    val game = makeGame(board, rows, cols)
 
     Scene(game, game.board.myAnts.values.head, game.board.food.values.head)
   }
 
-  protected def makeGame(board: Board) = Game(
+  protected def makeGame(board: Board, rows: Int, cols: Int) = Game(
     turn = 42,
     board = board,
-    parameters = GameParameters.dummy,
+    parameters = GameParameters.dummy(rows = rows, cols = cols),
     memory = Memory.dummy,
     vision = Set()
   )
 
-  protected case class Scene(game: Game, ant: MyAnt, food: Food)
+  protected case class Scene(game: Game, ant: MyAnt, food: Food) {
+  }
 }

@@ -5,6 +5,8 @@ import org.scalatest._
 
 class PathFinderWallTest extends PathFinderTest {
 
+  val extendWorld = true
+
   test("Find north east path, horizontal wall") {
     val path = findPath("""wwwwww
                            .....f

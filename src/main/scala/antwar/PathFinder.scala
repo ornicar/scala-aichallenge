@@ -19,3 +19,10 @@ case class PathFinder(game: Game) {
   }
 
 }
+
+
+
+//ooo o
+//o ooo
+//o  o
+//ooooo

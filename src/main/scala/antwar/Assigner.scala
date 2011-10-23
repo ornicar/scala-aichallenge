@@ -11,10 +11,10 @@ class Assigner(game: Game) {
   val pathFinder = PathFinder(game)
 
   def distribute: List[Assignement] = {
-    val feeders = electFeeders(ants, Nil)
+    val feeders = electFeeders(ants, foods)
     val explorers = electExplorers(idle(ants, feeders))
 
-    Logger(this.getClass)("%d foods, %d feeders, %d explorers".format(foods.size, feeders.size, explorers.size))
+    Logger(this.getClass)("%d foods, %d ants, %d feeders, %d explorers".format(foods.size, ants.size, feeders.size, explorers.size))
 
     feeders.toList ::: explorers.toList
   }
@@ -22,7 +22,7 @@ class Assigner(game: Game) {
   def idle(ants: Set[MyAnt], assignements: Set[Assignement]): Set[MyAnt] =
     ants -- (assignements map (_.ant))
 
-  def electFeeders(ants: Set[MyAnt], foods: List[Food]): Set[Assignement] = (ants, foods) match {
+  def electFeeders(myAnts: Set[MyAnt], foods: List[Food]): Set[Assignement] = (myAnts, foods) match {
     case (ants, _) if ants.isEmpty => Set()
     case (_, Nil) => Set()
     case (ants, food :: otherFoods) => this nearest ants.toSeq from food match {
@@ -36,9 +36,9 @@ class Assigner(game: Game) {
   def electExplorers(ants: Set[MyAnt]): Set[Assignement] =
     ants map { Assignement(_, Explore()) }
 
-  def nearest[A <: Positionable](objs: Seq[A]) = new {
-    def from(tile: Tile): Option[A] = {
-      val objPaths: Seq[(A, Path)] = for {
+  def nearest(objs: Seq[MyAnt]) = new {
+    def from(tile: Tile): Option[MyAnt] = {
+      val objPaths: Seq[(MyAnt, Path)] = for {
         obj <- objs
         if (world distanceFrom obj to tile) < 14
         path <- pathFinder from obj to tile
