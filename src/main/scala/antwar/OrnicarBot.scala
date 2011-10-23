@@ -16,8 +16,9 @@ class OrnicarBot extends Bot {
         assignement aim game match {
           case None => recursiveOrders(rest, game)
           case Some(aim) => {
-            val newGame = game.moving(assignement.ant, game.world tile aim of assignement.ant)
-            recursiveOrders(rest, newGame) + Order(assignement.ant, aim)
+            val toTile = game.world tile aim of assignement.ant
+            game.board.move(assignement.ant, toTile)
+            recursiveOrders(rest, game) + Order(assignement.ant, aim)
           }
         }
       }
