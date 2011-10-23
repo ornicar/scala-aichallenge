@@ -8,26 +8,19 @@ object OrnicarBot extends App {
 
 class OrnicarBot extends Bot {
 
-  def ordersFrom(game: Game): Set[Order] = {
-
-    def recursiveOrders(assignements: List[Assignement], game: Game): Set[Order] = assignements match {
-      case Nil => Set()
-      case assignement :: rest => {
-        assignement aim game match {
-          case None => recursiveOrders(rest, game)
-          case Some(aim) => {
-            val toTile = game.world tile aim of assignement.ant
-            game.board.move(assignement.ant, toTile)
-            recursiveOrders(rest, game) + Order(assignement.ant, aim)
-          }
-        }
-      }
-    }
+  def ordersFrom(game: Game): List[Order] = {
 
     val assignements = Timer.monitor("assign") {
       (new Assigner(game)).distribute
     }
 
-    recursiveOrders(assignements, game)
+    assignements flatMap { assignement =>
+      assignement aim game map { aim =>
+        val ant = assignement.ant
+        val destination = game.world tile aim of ant
+        game.board.move(ant, destination)
+        Order(ant, aim)
+      }
+    }
   }
 }
