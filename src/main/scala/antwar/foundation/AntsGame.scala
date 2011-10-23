@@ -2,45 +2,55 @@ package antwar.foundation
 
 import antwar._
 
-import annotation.tailrec
 import io.Source
 import java.io._
+import annotation.tailrec
 
 class AntsGame(in: InputStream = System.in, out: OutputStream = System.out) {
 
   val source = new BufferedSource(in, Source.DefaultBufSize)
   val writer = new BufferedWriter(new OutputStreamWriter(out))
+  val parser = new Parser(source)
+  val builder = new GameBuilder
 
   Logger.clear
 
   def run(bot: Bot) = {
-    try {
 
-      def playNextTurn(game: Game): Unit = {
-        Parser.parse(source, game.parameters, game.board.water, game.memory) match {
-          case g: GameOver => Unit
-          case g: GameInProgress => {
-            val timer = Timer("all")
-            // first time, we have to replace the empty memory with a game memory
-            val memory = g.memory match {
-              case _: EmptyMemory => Memory(g)
-              case x: GameMemory => x
-            }
-            // apply game vision to game memory
-            val game = g.copy(memory = memory seeing g.vision)
-            val orders = bot.ordersFrom(game)
-            orders.map(_.inServerSpeak).foreach(writer.write)
-            timer.print
-            writer.write("go\n")
-            writer.flush
-            playNextTurn(game)
-          }
-        }
+    Logger.info("Running")
+
+    @tailrec
+    def turn(game: GameInProgress) {
+      val t = Timer("ALL")
+      val orders = bot ordersFrom game
+      t.log
+      writeOrders(orders)
+      builder.makeGame(parser.parseTurn, game) match {
+        case None =>
+        case Some(g) => turn(g)
       }
-      playNextTurn(GameInProgress())
-
-    } catch {
-      case t => t.printStackTrace
     }
+
+    try {
+      val setup = builder.makeGameSetup(parser.parseSetup)
+      writeGo
+      builder.makeGame(parser.parseTurn, setup) map turn
+    } catch { case e => logException(e) }
+
+    Logger.info("Graceful shutdown.")
+  }
+
+  private def logException(e: Throwable) {
+    val sw = new StringWriter()
+    e.printStackTrace(new PrintWriter(sw));
+    Logger("EXCEPTION")(sw.toString)
+  }
+
+  private def writeGo = writeOrders(Set.empty)
+
+  private def writeOrders(orders: Set[Order]) {
+    orders map (_.inServerSpeak) foreach writer.write
+    writer write "go\n"
+    writer.flush
   }
 }

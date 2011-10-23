@@ -1,3 +1,3 @@
 package antwar.foundation
 
-case class Tile(column: Int, row: Int)
+case class Tile(col: Int, row: Int)

@@ -3,6 +3,7 @@
 tools
 tags
 .ctags
+log
 
 # sbt specific
 dist/*

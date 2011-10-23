@@ -16,7 +16,7 @@ class Assigner(game: Game) {
     val explorers = electExplorers(idle(ants, feeders))
 
     val assignements = feeders.toList ::: explorers.toList
-    t.print
+    t.log
     assignements
   }
 

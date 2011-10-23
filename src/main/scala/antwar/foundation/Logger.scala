@@ -13,7 +13,7 @@ object Logger {
 
   def apply(priority: String)(msg: => Any) {
     withWriter(file) { w =>
-      w.write("[%s] %s\n".format(priority.toUpperCase, msg.toString))
+      w.write("[%s] %s\n".format(priority, msg.toString))
     }
   }
 

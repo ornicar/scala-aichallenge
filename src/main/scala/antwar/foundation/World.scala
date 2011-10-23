@@ -2,13 +2,13 @@ package antwar.foundation
 
 import scala.math.{abs,min,pow,sqrt}
 
-case class World(rows: Int, columns: Int) {
+case class World(rows: Int, cols: Int) {
 
   def distanceFrom(one: Tile) = new {
     def to(other: Tile): Double = {
-      val dCol = abs(one.column - other.column)
+      val dCol = abs(one.col - other.col)
       val dRow = abs(one.row - other.row)
-      min(dCol, columns - dCol) + min(dRow, columns - dRow)
+      min(dCol, cols - dCol) + min(dRow, cols - dRow)
     }
   }
 
@@ -25,10 +25,10 @@ case class World(rows: Int, columns: Int) {
     } else None
 
   def ewDirection(one: Tile, other: Tile): Option[CardinalPoint] =
-    if (one.column < other.column) {
-      if (other.column - one.column >= columns / 2) Some(West) else Some(East)
-    } else if (one.column > other.column) {
-      if (one.column - other.column >= columns / 2) Some(East) else Some(West)
+    if (one.col < other.col) {
+      if (other.col - one.col >= cols / 2) Some(West) else Some(East)
+    } else if (one.col > other.col) {
+      if (one.col - other.col >= cols / 2) Some(East) else Some(West)
     } else None
 
   def singleDirection(one: Tile, other: Tile): Option[CardinalPoint] =
@@ -38,15 +38,15 @@ case class World(rows: Int, columns: Int) {
     nsDirection(one, other) map { (_, abs(one.row - other.row)) }
 
   def ewDistance(one: Tile, other: Tile): Option[(CardinalPoint, Int)] =
-    ewDirection(one, other) map { (_, abs(one.column - other.column)) }
+    ewDirection(one, other) map { (_, abs(one.col - other.col)) }
 
   def tile(aim: CardinalPoint) = new {
     def of(tile: Tile) = {
       aim match {
         case North => tile.copy(row = if (tile.row == 0) rows - 1 else tile.row - 1)
         case South => tile.copy(row = (tile.row + 1) % rows)
-        case East => tile.copy(column = (tile.column + 1) % columns)
-        case West => tile.copy(column = if (tile.column == 0) columns - 1 else tile.column - 1)
+        case East => tile.copy(col = (tile.col + 1) % cols)
+        case West => tile.copy(col = if (tile.col == 0) cols - 1 else tile.col - 1)
       }
     }
   }

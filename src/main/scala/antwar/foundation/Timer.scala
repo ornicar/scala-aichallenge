@@ -4,8 +4,10 @@ case class Timer(label: String) {
 
   val start: Long = System.currentTimeMillis
 
-  def print = Logger.info(toString)
+  def log = Logger(label)(currentTime + " ms")
+
+  def currentTime = System.currentTimeMillis - start
 
   override def toString =
-    "TIMER [ %d ] %s".format((System.currentTimeMillis - start), label)
+    "%d - %s".format(currentTime, label)
 }

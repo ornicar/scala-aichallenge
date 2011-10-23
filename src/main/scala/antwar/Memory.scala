@@ -2,26 +2,9 @@ package antwar
 
 import foundation._
 
-trait Memory {
+case class Memory(unseen: Set[Tile]) {
 
-  def unseen: Set[Tile]
-}
-
-case class GameMemory(unseen: Set[Tile]) extends Memory {
-
-	def seeing(vision: Set[Tile]): GameMemory = copy(
+	def seeing(vision: Set[Tile]): Memory = copy(
 		unseen = unseen -- vision
 	)
-}
-
-case class EmptyMemory() extends Memory {
-
-  def unseen = Set[Tile]()
-}
-
-object Memory {
-
-  def apply(game: Game): GameMemory = GameMemory(
-    unseen = game.tiles.toSet
-  )
 }
