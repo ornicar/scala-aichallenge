@@ -5,7 +5,8 @@ import scala.collection.mutable
 case class Board(myAnts: mutable.Map[Tile, MyAnt],
                  enemyAnts: Map[Tile, EnemyAnt],
                  water: Map[Tile, Water],
-                 food: Map[Tile, Food]) {
+                 food: Map[Tile, Food],
+                 hives: Map[Tile, Hive]) {
 
   lazy val elements = myAnts ++ enemyAnts ++ water ++ food
 
@@ -13,15 +14,10 @@ case class Board(myAnts: mutable.Map[Tile, MyAnt],
 
   lazy val foodList = food.values.toList
 
-  def moving(from: Tile, to: Tile): Board = copy(
-    myAnts = (this.myAnts - from).updated(to, MyAnt(to))
-  )
-
   def move(from: Tile, to: Tile) {
     myAnts -= from
     myAnts += ((to, MyAnt(to)))
   }
-
 }
 
 object Board {
@@ -29,12 +25,14 @@ object Board {
   def apply(myAnts: List[Tile],
             enemyAnts: List[Tile],
             water: List[Tile],
-            food: List[Tile]): Board = {
+            food: List[Tile],
+            hives: List[Tile]): Board = {
 
     Board(toMutableMap(toMap(myAnts, t => MyAnt(t))),
           toMap(enemyAnts, t => EnemyAnt(t)),
           toMap(water, t => Water(t)),
-          toMap(food, t => Food(t)))
+          toMap(food, t => Food(t)),
+          toMap(hives, t => Hive(t)))
   }
 
   private def toMap[A <: Positionable](tiles: List[Tile], builder: Tile => A) =

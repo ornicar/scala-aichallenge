@@ -27,15 +27,29 @@ case class Game(
 
   lazy val world = World(parameters.rows, parameters.cols)
 
-  def moving(from: Tile, to: Tile): Game = copy(board = board.moving(from, to))
-
   def free(tile: Tile) = !(board.myAnts contains tile) && !(board.water contains tile)
 
   def choices(tile: Tile) =
     CardinalPoint.all filter { aim => free(world tile aim of tile) }
 
-  def isolation(tile: Tile): Int =
-    (0 /: board.myAnts.keys) { (a, t) => a + world.distanceFrom(tile, t) }
+  def isolation(tile: Tile): Double = {
+    (.0 /: board.myAnts.keys) { (a, t) =>
+      a + world.distanceFrom(tile, t)
+    }
+  }
+
+  def saturation(tile: Tile): Int = {
+    board.myAnts.keys count { t =>
+      world.flyDistanceFrom(tile, t) < 10
+    }
+  }
+
+  //def isolationDistance(one: Tile, other: Tile): Double = {
+    //import scala.math._
+    //val dRow = abs(one.row - other.row)
+    //val dCol = abs(one.col - other.col)
+    //sqrt(pow(dRow, 2) + pow(dCol, 2))
+  //}
 
   def visible(tile: Tile): Boolean = vision contains tile
 }

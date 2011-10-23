@@ -29,7 +29,7 @@ class GameBuilder(parameters: GameParameters) extends Builder {
   }
 
   val tileRegex = """(\d+)\s(\d+)""".r
-  val antRegex = """(\d+)\s(\d+)\s(\d+)""".r
+  val ownRegex = """(\d+)\s(\d+)\s(\d+)""".r
 
   def apply(lines: List[String], from: GameLike): Option[Game] = {
 
@@ -40,15 +40,23 @@ class GameBuilder(parameters: GameParameters) extends Builder {
     val food = mutable.ListBuffer[Tile]()
     val myAnts = mutable.ListBuffer[Tile]()
     val enemyAnts = mutable.ListBuffer[Tile]()
+    val hives = mutable.ListBuffer[Tile]()
 
     def tile(str: String): Tile = str match {
       case tileRegex(row, col) => Tile(row.toInt, col.toInt)
     }
 
     def ant(str: String): Either[Tile, Tile] = str match {
-      case antRegex(row, col, player) => player.toInt match {
+      case ownRegex(row, col, player) => player.toInt match {
         case 0 => Left(Tile(row.toInt, col.toInt))
         case _ => Right(Tile(row.toInt, col.toInt))
+      }
+    }
+
+    def hive(str: String): Option[Tile] = str match {
+      case ownRegex(row, col, player) => player.toInt match {
+        case 0 => None
+        case _ => Some(Tile(row.toInt, col.toInt))
       }
     }
 
@@ -60,12 +68,12 @@ class GameBuilder(parameters: GameParameters) extends Builder {
         case Left(a) => myAnts += a
         case Right(a) => enemyAnts += a
       }
-      case ("h", x) => // TODO hive
+      case ("h", x) => hive(x) map { hives += _ }
       case ("d", x) => // TODO dead
     }
 
     val allWater = water.toList ::: from.knownWater
-    val board = Board(myAnts.toList, enemyAnts.toList, allWater, food.toList)
+    val board = Board(myAnts.toList, enemyAnts.toList, allWater, food.toList, hives.toList)
     val vision = makeVision(board)
     val memory = from.memory seeing vision
 

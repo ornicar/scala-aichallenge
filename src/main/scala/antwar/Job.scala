@@ -15,15 +15,15 @@ trait Job {
 case class Explore() extends Job {
 
   def aim(ant: MyAnt, game: Game) = {
-    val choices = game choices ant
-    if (choices.isEmpty) None
-    else {
-      val isolatedChoices = choices map { aim =>
-        val tile = game.world tile aim of ant
-        (aim, game.isolation(tile))
+    game choices ant match {
+      case Nil => None
+      case choices => {
+        val informedChoices = choices map { aim =>
+          val tile = game.world.tile(aim, 1) of ant
+          (aim, game.isolation(tile))
+        }
+        Some(informedChoices.maxBy(_._2)._1)
       }
-      val bestIsolatedChoice = isolatedChoices maxBy { _._2 }
-      Some(bestIsolatedChoice._1)
     }
   }
 }
