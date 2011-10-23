@@ -5,20 +5,20 @@ import io.Source
 
 class Parser(source: Source) {
 
-  def parseSetup = parseUntil("ready")
-  def parseTurn = parseUntil("go")
+  def setup = until("ready")
+  def turn = until("go")
 
   //@tailrec
-  private def parseUntil(end: String): List[String] = {
+  private def until(end: String): List[String] = {
 
     val lines = source.getLines
 
-    def doParse: List[String] = lines.next.trim match {
-      case "" => doParse
+    def parse: List[String] = lines.next.trim match {
+      case "" => parse
       case line if line == end => Nil
-      case line => line :: doParse
+      case line => line :: parse
     }
 
-    doParse
+    parse
   }
 }

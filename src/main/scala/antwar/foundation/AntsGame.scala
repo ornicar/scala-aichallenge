@@ -11,7 +11,6 @@ class AntsGame(in: InputStream = System.in, out: OutputStream = System.out) {
   val source = new BufferedSource(in, Source.DefaultBufSize)
   val writer = new BufferedWriter(new OutputStreamWriter(out))
   val parser = new Parser(source)
-  val builder = new GameBuilder
 
   Logger.clear
 
@@ -19,23 +18,32 @@ class AntsGame(in: InputStream = System.in, out: OutputStream = System.out) {
 
     Logger.info("Running")
 
+    val timer = Timer("setup")
+    val setup = (new SetupBuilder)(parser.setup)
+    val builder = new GameBuilder(setup.parameters)
+    writeGo
+    timer.log()
+
     @tailrec
-    def turn(game: Game) {
-      val t = Timer("ALL")
-      val orders = bot ordersFrom game
-      t.log
-      writeOrders(orders)
-      builder.makeGame(parser.parseTurn, game) match {
+    def turn(gameLike: GameLike) {
+      val parsed = parser.turn
+      val timer = Timer("total")
+      val game = Timer.monitor("build") { builder(parsed, gameLike) }
+      game match {
         case None =>
-        case Some(g) => turn(g)
+        case Some(game) => {
+          Timer.monitor("AI") { writeOrders(bot ordersFrom game) }
+          Logger.info("------------------------------------------------------- " + timer)
+          turn(game)
+        }
       }
     }
 
     try {
-      val setup = builder.makeGameSetup(parser.parseSetup)
-      writeGo
-      builder.makeGame(parser.parseTurn, setup) map turn
-    } catch { case e => logException(e) }
+      turn(setup)
+    } catch {
+      case e => logException(e)
+    }
 
     Logger.info("Graceful shutdown.")
   }

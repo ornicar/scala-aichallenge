@@ -1,13 +1,12 @@
 package antwar.foundation
 
-case class GameParameters(loadTime: Int = 2000,
-                          turnTime: Int = 2000,
-                          rows: Int = 20,
-                          cols: Int = 20,
-                          seed: Int = 0,
-                          turns: Int = 500,
-                          viewRadius: Int = 93,
-                          attackRadius: Int = 6,
-                          spawnRadius: Int = 6) {
-
-}
+case class GameParameters(loadTime: Int,
+                          turnTime: Int,
+                          rows: Int,
+                          cols: Int,
+                          seed: Int,
+                          turns: Int,
+                          viewRadius: Int,
+                          attackRadius: Int,
+                          spawnRadius: Int,
+                          tiles: Set[Tile])
