@@ -4,17 +4,10 @@ import scala.math.{abs,min,pow,sqrt}
 
 case class World(rows: Int, cols: Int) {
 
-  def distanceFrom(one: Tile) = new {
-    def to(other: Tile): Double = {
-      val dRow = abs(one.row - other.row)
-      val dCol = abs(one.col - other.col)
-      min(dRow, cols - dRow) + min(dCol, cols - dCol)
-    }
-  }
-
-  def directionFrom(one: Tile) = new {
-    def to(other: Tile): Set[CardinalPoint] =
-      (nsDirection(one, other).toList ::: ewDirection(one, other).toList).toSet
+  def distanceFrom(one: Tile, other: Tile): Int = {
+    val dRow = abs(one.row - other.row)
+    val dCol = abs(one.col - other.col)
+    min(dRow, cols - dRow) + min(dCol, cols - dCol)
   }
 
   def nsDirection(one: Tile, other: Tile): Option[CardinalPoint] =

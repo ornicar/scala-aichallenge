@@ -15,20 +15,6 @@ trait Job {
 case class Explore() extends Job {
 
   def aim(ant: MyAnt, game: Game) = any(ant, game)
-
-  //def aimTimeout(ant: MyAnt, game: Game) = {
-    //val pathFinder = PathFinder(game)
-    //val choices = game choices ant
-    //val targets: List[(Tile, Int)] = for {
-      //tile <- game.memory.unseen.toList filter game.free
-      //dist = (game.world distanceFrom ant to tile).toInt
-    //} yield (tile, dist)
-    //val tiles = targets sortWith { _._2 < _._2 } map (_._1) take 10
-    //for {
-      //tile <- tiles find { t => (pathFinder from ant to t).isDefined }
-      //path <- pathFinder from ant to tile
-    //} yield path.aims.head
-  //}
 }
 
 trait Goto extends Job {

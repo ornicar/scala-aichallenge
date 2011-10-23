@@ -4,16 +4,20 @@ import java.io._
 
 object Logger {
 
+  val enabled = true
+
   def info = apply("info")(_)
   def err  = apply("err!")(_)
 
   def clear { file.delete }
 
-  private val file = new File("log")
+  private lazy val file = new File("log")
 
   def apply(title: Any)(msg: => Any) {
-    withWriter(file) { w =>
-      w.write("[%s] %s\n".format(title, msg))
+    if (enabled) {
+      withWriter(file) { w =>
+        w.write("[%s] %s\n".format(title, msg))
+      }
     }
   }
 

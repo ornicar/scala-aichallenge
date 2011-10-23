@@ -57,8 +57,8 @@ class AntsGame(in: InputStream = System.in, out: OutputStream = System.out) {
   private def writeGo = writeOrders(Nil)
 
   private def writeOrders(orders: List[Order]) {
-    orders map (_.inServerSpeak) foreach writer.write
-    writer write "go\n"
+    val text = orders map (_.inServerSpeak) mkString "\n" + "\n"
+    writer write (text + "go\n")
     writer.flush
   }
 }

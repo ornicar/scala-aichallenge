@@ -40,7 +40,7 @@ class Assigner(game: Game) {
     def from(tile: Tile): Option[MyAnt] = {
       val objPaths: Seq[(MyAnt, Path)] = for {
         obj <- objs
-        if (world distanceFrom obj to tile) < 14
+        if (world.distanceFrom(obj, tile)) < 14
         path <- pathFinder from obj to tile
       } yield (obj, path)
       objPaths.sortWith{ case (a, b) => a._2.size < b._2.size }.headOption map (_._1)
