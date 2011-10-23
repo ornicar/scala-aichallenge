@@ -14,7 +14,18 @@ trait Job {
 
 case class Explore() extends Job {
 
-  def aim(ant: MyAnt, game: Game) = any(ant, game)
+  def aim(ant: MyAnt, game: Game) = {
+    val choices = game choices ant
+    if (choices.isEmpty) None
+    else {
+      val isolatedChoices = choices map { aim =>
+        val tile = game.world tile aim of ant
+        (aim, game.isolation(tile))
+      }
+      val bestIsolatedChoice = isolatedChoices maxBy { _._2 }
+      Some(bestIsolatedChoice._1)
+    }
+  }
 }
 
 trait Goto extends Job {

@@ -34,5 +34,8 @@ case class Game(
   def choices(tile: Tile) =
     CardinalPoint.all filter { aim => free(world tile aim of tile) }
 
+  def isolation(tile: Tile): Int =
+    (0 /: board.myAnts.keys) { (a, t) => a + world.distanceFrom(tile, t) }
+
   def visible(tile: Tile): Boolean = vision contains tile
 }
