@@ -31,8 +31,8 @@ case class World(rows: Int, columns: Int) {
       if (one.column - other.column >= columns / 2) Some(East) else Some(West)
     } else None
 
-  def singleDirection(one: Tile, other: Tile): CardinalPoint =
-    nsDirection(one, other) getOrElse ewDirection(one, other).get
+  def singleDirection(one: Tile, other: Tile): Option[CardinalPoint] =
+    nsDirection(one, other) orElse ewDirection(one, other)
 
   def nsDistance(one: Tile, other: Tile): Option[(CardinalPoint, Int)] =
     nsDirection(one, other) map { (_, abs(one.row - other.row)) }

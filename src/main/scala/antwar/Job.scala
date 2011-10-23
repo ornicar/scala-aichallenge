@@ -13,22 +13,22 @@ trait Job {
 case class Explore() extends Job {
 
   def aim(ant: MyAnt, game: Game) = {
-    val pathFinder = PathFinder(game)
-    val choices = game choices ant
-    val targets: List[(Tile, Int)] = for {
-      tile <- game.memory.unseen.toList
-      dist = (game.world distanceFrom ant to tile).toInt
-      if dist < 30
-    } yield (tile, dist)
-    println(targets)
-    println("%d unseen, %d targets" format (game.memory.unseen.toList.size, targets.size))
-    val tiles = targets sortWith { _._2 < _._2 } map (_._1)
-
-    val aims = tiles map { t => game.world.singleDirection(ant, t) }
-    val aim = aims find { aim => choices contains aim }
-
-    aim
+    any(game choices ant)
   }
+
+  //def aimTimeout(ant: MyAnt, game: Game) = {
+    //val pathFinder = PathFinder(game)
+    //val choices = game choices ant
+    //val targets: List[(Tile, Int)] = for {
+      //tile <- game.memory.unseen.toList filter game.free
+      //dist = (game.world distanceFrom ant to tile).toInt
+    //} yield (tile, dist)
+    //val tiles = targets sortWith { _._2 < _._2 } map (_._1) take 10
+    //for {
+      //tile <- tiles find { t => (pathFinder from ant to t).isDefined }
+      //path <- pathFinder from ant to tile
+    //} yield path.aims.head
+  //}
 }
 
 trait Goto extends Job {

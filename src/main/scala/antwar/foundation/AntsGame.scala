@@ -18,7 +18,7 @@ class AntsGame(in: InputStream = System.in, out: OutputStream = System.out) {
         Parser.parse(source, game.parameters, game.board.water, game.memory) match {
           case g: GameOver => Unit
           case g: GameInProgress => {
-            val timer = new Timer
+            val timer = Timer("all")
             // first time, we have to replace the empty memory with a game memory
             val memory = g.memory match {
               case _: EmptyMemory => Memory(g)
@@ -28,7 +28,7 @@ class AntsGame(in: InputStream = System.in, out: OutputStream = System.out) {
             val game = g.copy(memory = memory seeing g.vision)
             val orders = bot.ordersFrom(game)
             orders.map(_.inServerSpeak).foreach(writer.write)
-            println(timer.toString)
+            timer.print
             writer.write("go\n")
             writer.flush
             playNextTurn(game)

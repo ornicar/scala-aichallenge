@@ -1,11 +1,11 @@
 package antwar.foundation
 
-final class Timer {
+case class Timer(label: String) {
 
   val start: Long = System.currentTimeMillis
 
-  override def toString = {
-    val current = System.currentTimeMillis
-    ">   " + (current - start)/ 1000.0 + " s"
-  }
+  def print = println(toString)
+
+  override def toString =
+    "TIMER [ %d ] %s".format((System.currentTimeMillis - start), label)
 }

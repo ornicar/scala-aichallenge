@@ -11,11 +11,14 @@ class Assigner(game: Game) {
   val pathFinder = PathFinder(game)
 
   def distribute: List[Assignement] = {
+    val t = Timer("assignement")
     val feeders = electFeeders(ants, foods)
     val explorers = electExplorers(idle(ants, feeders))
     println("distribute %d feeders & %d explorers" format (feeders.size, explorers.size))
 
-    feeders.toList ::: explorers.toList
+    val assignements = feeders.toList ::: explorers.toList
+    t.print
+    assignements
   }
 
   def idle(ants: Set[MyAnt], assignements: Set[Assignement]): Set[MyAnt] =

@@ -26,7 +26,7 @@ final class TilePath(world: World, val tiles: List[Tile]) extends Path {
   def from = tiles.head
 
   lazy val aims = ((tiles.head, List[CardinalPoint]()) /: tiles.tail) { case ((prevTile, aims), tile) =>
-    (tile, world.singleDirection(prevTile, tile) :: aims)
+    (tile, world.singleDirection(prevTile, tile).get :: aims)
   }._2.reverse
 
   lazy val size = aims.size

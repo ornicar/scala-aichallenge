@@ -38,7 +38,7 @@ sealed trait Game {
   def visible(tile: Tile): Boolean = vision contains tile
 
   // All tiles actually visibles
-  val vision: Set[Tile] = {
+  lazy val vision: Set[Tile] = {
     import parameters._
     // precalculate squares around an ant to set as visible
     val mx = math.sqrt(viewRadius).toInt
@@ -52,10 +52,8 @@ sealed trait Game {
     val tiles = for {
       Tile(aRow, aCol) <- board.myAnts.keys
       (vRow, vCol) <- offsets
-    } yield Tile((aRow + vRow) % rows, (aCol + aCol) % columns)
+    } yield Tile((aRow + vRow) % rows, (aCol + vCol) % columns)
 
-    //println("ants " + board.myAnts.keys)
-    //println("vision " + tiles)
     tiles.toSet
   }
 }
