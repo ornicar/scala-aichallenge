@@ -8,19 +8,20 @@ case class Board(myAnts: Map[Tile, MyAnt],
   lazy val elements = myAnts ++ enemyAnts ++ water ++ food
 
   lazy val myAntSet = myAnts.values.toSet
+
   lazy val foodList = food.values.toList
 
   def moving(from: Tile, to: Tile): Board = copy(
-    myAnts = this.myAnts.filterNot{case (t, _) => t == from}.updated(to, MyAnt(to))
+    myAnts = (this.myAnts - from).updated(to, MyAnt(to))
   )
 }
 
 object Board {
 
-  def apply(myAnts: Seq[Tile],
-            enemyAnts: Seq[Tile],
-            water: Seq[Tile],
-            food: Seq[Tile]): Board = {
+  def apply(myAnts: List[Tile],
+            enemyAnts: List[Tile],
+            water: List[Tile],
+            food: List[Tile]): Board = {
 
     Board(toMap(myAnts, t => MyAnt(t)),
           toMap(enemyAnts, t => EnemyAnt(t)),
@@ -28,6 +29,6 @@ object Board {
           toMap(food, t => Food(t)))
   }
 
-  private def toMap[A <: Positionable](seq: Seq[Tile], builder: Tile => A) =
-    (seq map { tile => (tile, builder(tile)) }).toMap
+  private def toMap[A <: Positionable](tiles: List[Tile], builder: Tile => A) =
+    (tiles map { tile => (tile, builder(tile)) }).toMap
 }

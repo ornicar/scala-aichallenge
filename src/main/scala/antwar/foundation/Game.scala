@@ -6,9 +6,13 @@ import scala.math
 sealed trait GameLike {
   val parameters: GameParameters
   val memory: Memory
+  val knownWater: Set[Tile]
 }
 
-case class GameSetup(parameters: GameParameters, memory: Memory) extends GameLike
+case class GameSetup(parameters: GameParameters, memory: Memory) extends GameLike {
+
+  val knownWater: Set[Tile] = Set.empty
+}
 
 case class Game(
   turn: Int,
@@ -16,6 +20,8 @@ case class Game(
   board: Board,
   memory: Memory,
   vision: Set[Tile]) extends GameLike {
+
+  val knownWater: Set[Tile] = board.water.keys.toSet
 
   def tiles = parameters.tiles
 

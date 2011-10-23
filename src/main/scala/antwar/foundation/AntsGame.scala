@@ -33,7 +33,7 @@ class AntsGame(in: InputStream = System.in, out: OutputStream = System.out) {
         case None =>
         case Some(game) => {
           Timer.monitor("AI") { writeOrders(bot ordersFrom game) }
-          Logger.info("------------------------------------------------------- " + timer)
+          Logger.info(game.turn + " ------------------------------------------------------- " + timer)
           turn(game)
         }
       }

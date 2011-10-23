@@ -23,7 +23,9 @@ class OrnicarBot extends Bot {
       }
     }
 
-    val assignements = (new Assigner(game)).distribute
+    val assignements = Timer.monitor("assign") {
+      (new Assigner(game)).distribute
+    }
 
     recursiveOrders(assignements, game)
   }

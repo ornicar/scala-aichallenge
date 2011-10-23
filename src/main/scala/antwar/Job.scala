@@ -7,14 +7,14 @@ trait Job {
 
   def aim(ant: MyAnt, game: Game): Option[CardinalPoint]
 
-  def any(choices: List[CardinalPoint]) = shuffle(choices).headOption
+  def any(choices: List[CardinalPoint]): Option[CardinalPoint] = shuffle(choices).headOption
+
+  def any(ant: MyAnt, game: Game): Option[CardinalPoint] = any(game choices ant)
 }
 
 case class Explore() extends Job {
 
-  def aim(ant: MyAnt, game: Game) = {
-    any(game choices ant)
-  }
+  def aim(ant: MyAnt, game: Game) = any(ant, game)
 
   //def aimTimeout(ant: MyAnt, game: Game) = {
     //val pathFinder = PathFinder(game)
@@ -33,7 +33,10 @@ case class Explore() extends Job {
 
 trait Goto extends Job {
 
-  def aim(ant: MyAnt, game: Game) = PathFinder(game) from ant to target map { _.aims.head }
+  def aim(ant: MyAnt, game: Game) = {
+    val aim = PathFinder(game) from ant to target map { _.aims.head }
+    aim orElse any(ant, game)
+  }
 
   def target: Tile
 }

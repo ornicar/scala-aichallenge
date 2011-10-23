@@ -9,6 +9,9 @@ trait Builder {
     val pairs = lines map (_.trim) map { _ span (' '!=) } map { case (k, v) => (k, v.trim) }
     pairs.toMap
   }
+
+  def linesToPairs(lines: List[String]): List[(String, String)] =
+    lines map (_.trim) map { _ span (' '!=) } map { case (k, v) => (k, v.trim) }
 }
 
 class GameBuilder(parameters: GameParameters) extends Builder {
@@ -25,6 +28,9 @@ class GameBuilder(parameters: GameParameters) extends Builder {
     } yield (dRow, dCol)
   }
 
+  val tileRegex = """(\d+)\s(\d+)""".r
+  val antRegex = """(\d+)\s(\d+)\s(\d+)""".r
+
   def apply(lines: List[String], from: GameLike): Option[Game] = {
 
     if (lines.head == "end") return None
@@ -35,14 +41,10 @@ class GameBuilder(parameters: GameParameters) extends Builder {
     val myAnts = mutable.ListBuffer[Tile]()
     val enemyAnts = mutable.ListBuffer[Tile]()
 
-    val m = linesToMap(lines.init)
-
-    val tileRegex = """(\d+)\s(\d+)""".r
     def tile(str: String): Tile = str match {
       case tileRegex(row, col) => Tile(col.toInt, row.toInt)
     }
 
-    val antRegex = """(\d+)\s(\d+)\s(\d+)""".r
     def ant(str: String): Either[Tile, Tile] = str match {
       case antRegex(row, col, player) => player.toInt match {
         case 0 => Left(Tile(col.toInt, row.toInt))
@@ -50,7 +52,7 @@ class GameBuilder(parameters: GameParameters) extends Builder {
       }
     }
 
-    m foreach {
+    linesToPairs(lines.init) foreach {
       case ("turn", x) => turn = x.toInt
       case ("f", x) => food += tile(x)
       case ("w", x) => water += tile(x)
@@ -62,9 +64,7 @@ class GameBuilder(parameters: GameParameters) extends Builder {
       case ("d", x) => // TODO dead
     }
 
-    assert(turn > 0)
-
-    val board = Board(myAnts, enemyAnts, water, food)
+    val board = Board(myAnts.toList, enemyAnts.toList, allWater.toList, food.toList)
     val vision = makeVision(board)
     val memory = from.memory seeing vision
 

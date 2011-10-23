@@ -11,9 +11,9 @@ object Logger {
 
   private val file = new File("log")
 
-  def apply(priority: String)(msg: => Any) {
+  def apply(title: Any)(msg: => Any) {
     withWriter(file) { w =>
-      w.write("[%s] %s\n".format(priority, msg.toString))
+      w.write("[%s] %s\n".format(title, msg))
     }
   }
 

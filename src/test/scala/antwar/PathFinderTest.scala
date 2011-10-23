@@ -15,21 +15,26 @@ abstract class PathFinderTest extends FunSuite {
 
   protected def makeScene(str: String): Scene = {
 
-    def find[A <: Positionable](symbol: Char, builder: Tile => A): Map[Tile, A] = {
+    def find[A <: Positionable](symbol: Char): List[Tile] = {
       for {
         (line, row) <- (str.lines map (_.trim)).zipWithIndex
         (char, col) <- line.zipWithIndex
         if (char == symbol)
-        tile = Tile(col, row)
-      } yield (tile, builder(tile))
-    }.toMap
+      } yield Tile(col, row)
+    }.toList
 
-    val water = find('w', tile => Water(tile))
-    val myAnts = find('a', tile => MyAnt(tile))
-    val food = find('f', tile => Food(tile))
-    val game = Game(board = Board(water = water, myAnts = myAnts, food = food))
-    Scene(game, myAnts.values.head, food.values.head)
+    val game = makeGame(Board(water = find('w'), myAnts = find('a'), enemyAnts = find('e'), food = find('f')))
+
+    Scene(game, game.board.myAnts.values.head, game.board.food.values.head)
   }
+
+  protected def makeGame(board: Board) = Game(
+    turn = 42,
+    board = board,
+    parameters = GameParameters.dummy,
+    memory = Memory.dummy,
+    vision = Set()
+  )
 
   protected case class Scene(game: Game, ant: MyAnt, food: Food)
 }

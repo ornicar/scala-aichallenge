@@ -8,3 +8,8 @@ case class Memory(unseen: Set[Tile]) {
 		unseen = unseen -- vision
 	)
 }
+
+object Memory {
+
+  def dummy: Memory = Memory(unseen = Set.empty)
+}
