@@ -4,106 +4,93 @@ import scala.math
 import scala.collection.mutable.PriorityQueue
 
 /**
+ * Performance oriented implementation of A*
  * Adapted from the work of Brian Grinstead (http://www.briangrinstead.com/blog/astar-search-algorithm-in-javascript-updated)
+ * Usage: val solution = Astar.search(world, start, end)
  */
-class Astar(world: Map[(Int, Int), Boolean]) {
+object Astar {
 
   type Pos = (Int, Int)
-
+  type World = Map[Pos, Boolean]
   type Heuristic = (Pos, Pos) => Int
 
-  class Node(val pos: Pos, val wall: Boolean) extends Ordered[Node] {
-
-    // The total cost of getting to that node (pretty straightforward).
-    var g = 0
-
-    // The estimated time to reach the finish from the current node.
-    var h = 0
-
-    // Simply g(x) + h(x). The lower the f(x), the better.
-    def f = g + h
-
-    var visited = false
-    var closed = false
-    var parent: Option[Node] = None
-
-    def row = pos._1
-    def col = pos._2
-
-    def compare(that: Node) = f compare that.f
-
-    def valid: Boolean = !(wall || closed)
-  }
-
-  class Graph(nodes: Map[Pos, Node]) {
-
-    def apply(pos: Pos) = nodes.apply(pos)
-
-    def get(pos: Pos) = nodes.get(pos)
-
-    def neighbors(node: Node) = List(
-        get(node.row -1, node.col)
-      , get(node.row +1, node.col)
-      , get(node.row, node.col -1)
-      , get(node.row, node.col +1)
-    ) filterNot (_.isEmpty) map (_.get)
-  }
-
-  def search(s: Pos, e: Pos, heuristic: Heuristic = manhattan): List[Pos] = {
+  def search(world: World, s: Pos, e: Pos, heuristic: Heuristic = manhattan): List[Pos] = {
 
     val nodes = world map { case (pos, wall) => (pos, new Node(pos, wall)) }
     val graph = new Graph(nodes.toMap)
-    val start = graph(s)
-    val end = graph(e)
+    val end = graph nodes e
 
-		var openHeap = new PriorityQueue[Node]()
+		var heap = new PriorityQueue[Node]()
+		heap enqueue graph.nodes(s)
 
-		openHeap.enqueue(start)
+    while(heap.nonEmpty) {
 
-    while(openHeap.nonEmpty) {
-
-      // Grab the lowest f(x) to process next.  Heap keeps this sorted for us.
-      var currentNode = openHeap.dequeue
+      // Grab the lowest f(x) to process next. Heap keeps this sorted for us.
+      var node = heap.dequeue
 
       // End case -- result has been found, return the traced path
-      if (currentNode == end) return path(currentNode).reverse map (_.pos)
+      if (node == end) return path(node).reverse map (_.pos)
 
-      // Normal case -- move currentNode from open to closed, process each of its neighbors
-      currentNode.closed = true
+      // Normal case -- move node from open to closed, process each of its neighbors
+      node.closed = true
 
-      graph.neighbors(currentNode) filter (_.valid) foreach { neighbor =>
+      for (neighbor <- graph.neighbors(node); if (!neighbor.wall && !neighbor.closed)) {
 
         // g score is the shortest distance from start to current node, we need to check if
-        //   the path we have arrived at this neighbor is the shortest one we have seen yet
-        // 1 is the distance from a node to it's neighbor.  This could be variable for weighted paths.
-        var gScore = currentNode.g + 1
+        // the path we have arrived at this neighbor is the shortest one we have seen yet
+        var gScore = node.g + 1
         var beenVisited = neighbor.visited
 
         if(!beenVisited || gScore < neighbor.g) {
-
-          // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
-          neighbor.visited = true
-          neighbor.parent = Some(currentNode)
-          neighbor.h = if (neighbor.h > 0) neighbor.h else heuristic(neighbor.pos, end.pos)
-          neighbor.g = gScore
+          // Found an optimal (so far) path to this node. Take score for node to see how good it is.
+          neighbor.parent = node
+          neighbor.update(gScore, heuristic(neighbor.pos, end.pos))
 
           if (!beenVisited) // Pushing to heap will put it in proper place based on the 'f' value.
-            openHeap.enqueue(neighbor)
-          //else // Already seen the node, but since it has been rescored we need to reorder it in the heap
-            //openHeap.rescoreElement(neighbor)
+            heap enqueue neighbor
         }
       }
     }
 
-    // No result was found -- empty list signifies failure to find path
-    Nil
+    Nil // No result was found -- empty list signifies failure to find path
   }
 
   private def path(node: Node): List[Node] = node.parent match {
-    case None => Nil
-    case Some(parent) => node :: path(parent)
+    case null => Nil
+    case parent => node :: path(parent)
   }
 
-  def manhattan(pos1: Pos, pos2: Pos): Int =
-    math.abs(pos2._1 - pos1._1) + math.abs(pos2._2 - pos1._2)
+  private def manhattan(pos1: Pos, pos2: Pos): Int = math.abs(pos2._1 - pos1._1) + math.abs(pos2._2 - pos1._2)
+
+  private class Node(val pos: Pos, val wall: Boolean) extends Ordered[Node] {
+
+    var g = 0 // The total cost of getting to that node (pretty straightforward).
+    var h = 0 // The estimated time to reach the finish from the current node.
+    var f = 0 // Simply g(x) + h(x). The lower the f(x), the better.
+    var visited = false
+    var closed = false
+    var parent: Node = null
+
+    def row = pos._1
+    def col = pos._2
+
+    def update(gg: Int, hh: => Int) {
+      g = gg
+      if (h == 0) h = hh // only compute this once
+      f = g + h
+      visited = true
+    }
+
+    def compare(that: Node) = that.f compare f
+  }
+
+  private class Graph(val nodes: Map[Pos, Node]) {
+
+    def neighbors(node: Node) = List(
+        nodes.get(node.row -1, node.col)
+      , nodes.get(node.row +1, node.col)
+      , nodes.get(node.row, node.col -1)
+      , nodes.get(node.row, node.col +1)
+    ) filterNot (_.isEmpty) map (_.get)
+  }
 }

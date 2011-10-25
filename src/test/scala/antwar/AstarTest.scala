@@ -11,7 +11,7 @@ class AstarTest extends FunSuite {
   test("Find straight horizontal path") {
 
     assertPath(""".......   .......
-                  .a....b   .a++++b
+                  .a....b   .a+++++
                   .......   .......""")
   }
 
@@ -22,54 +22,42 @@ class AstarTest extends FunSuite {
                   .......   ..+....
                   .......   ..+....
                   .......   ..+....
-                  ..b....   ..b....""")
+                  ..b....   ..+....""")
   }
 
   test("Find diagonal path") {
 
-    assertPath(""".a.....   .a+....
-                  .......   ..++...
-                  .......   ...++..
-                  .......   ....++.
-                  .....b.   .....b.""")
+    assertPath(""".a.....   .a.....
+                  .......   .++....
+                  .......   ..+....
+                  .......   ..+....
+                  .....b.   ..++++.""")
   }
 
-  //test("Find horizontal with tight maze path") {
+  test("Find horizontal with tight maze path") {
 
-    //val path = findPath("""....#.b
-                           //.##.#..
-                           //..#.##.
-                           //a.#....
-                           //..#.#..""")
+    assertPath("""....#.b   ++++#.+
+                  .##.#..   +##+#.+
+                  ..#.##.   +.#+##+
+                  a.#....   a.#++++
+                  ..#.#..   ..#.#..""")
+  }
 
-    //assert(path === """++++#.b
-                       //+##+#.+
-                       //+.#+##+
-                       //a.#++++
-                       //..#.#..""")
-  //}
+  test("Find horizontal loose maze path") {
 
-  //test("Find horizontal loose maze path") {
-
-    //val path = findPath(""".......
-                           //....#..
-                           //a...#..
-                           //...##.b
-                           //.......""")
-
-    //assert(path === """.......
-                       //....#..
-                       //a++.#..
-                       //..+##+b
-                       //..++++.""")
-  //}
+    assertPath(""".......   .......
+                  ....#..   ....#..
+                  a...#..   a...#..
+                  ...##.b   +++##.+
+                  .......   ..+++++""")
+  }
 
   private def assertPath(string: String) {
     val (worldString, solutionString) = splitString(string)
     val world = makeWorld(worldString)
     val from = find(worldString, 'a')
     val to = find(worldString, 'b')
-    val solution = new Astar(world).search(from, to)
+    val solution = Astar.search(world, from, to)
     val sw = drawSolution(worldString, solution, '+')
     assert("\n" + sw === "\n" + solutionString)
   }
