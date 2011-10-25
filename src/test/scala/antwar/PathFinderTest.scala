@@ -1,5 +1,6 @@
-package antwar
+package antwar.test
 
+import antwar._
 import foundation._
 
 import org.scalatest._
@@ -11,7 +12,7 @@ abstract class PathFinderTest extends FunSuite {
   protected def findPath(str: String): String = {
     val s = makeScene(str)
     val finder = PathFinder(s.game)
-    val path = finder from s.ant to s.food
+    val path = finder.search(s.ant, s.food)
     path map (_.compactString) getOrElse ""
   }
 

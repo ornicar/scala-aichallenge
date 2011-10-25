@@ -1,5 +1,6 @@
-package antwar
+package antwar.test
 
+import antwar._
 import foundation._
 import org.scalatest._
 

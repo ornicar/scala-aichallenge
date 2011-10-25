@@ -14,7 +14,8 @@ trait Job {
 
 case class Explore() extends Job {
 
-  def aim(ant: MyAnt, game: Game) = {
+  def aim(ant: MyAnt, game: Game) = any(ant, game)
+  def aim2(ant: MyAnt, game: Game) = {
     game choices ant match {
       case Nil => None
       case choices => {
@@ -31,7 +32,7 @@ case class Explore() extends Job {
 trait Goto extends Job {
 
   def aim(ant: MyAnt, game: Game) = {
-    val aim = PathFinder(game) from ant to target map { _.aims.head }
+    val aim = PathFinder(game).search(ant, target) map { _.aims.head }
     aim orElse any(ant, game)
   }
 

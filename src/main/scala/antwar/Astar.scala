@@ -55,12 +55,12 @@ object Astar {
     Nil // No result was found -- empty list signifies failure to find path
   }
 
+  def manhattan(pos1: Pos, pos2: Pos): Int = math.abs(pos2._1 - pos1._1) + math.abs(pos2._2 - pos1._2)
+
   private def path(node: Node): List[Node] = node.parent match {
     case null => Nil
     case parent => node :: path(parent)
   }
-
-  private def manhattan(pos1: Pos, pos2: Pos): Int = math.abs(pos2._1 - pos1._1) + math.abs(pos2._2 - pos1._2)
 
   private class Node(val pos: Pos, val wall: Boolean) extends Ordered[Node] {
 

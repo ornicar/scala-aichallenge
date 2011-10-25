@@ -12,6 +12,8 @@ sealed trait Path {
 
   def size: Int
 
+  def distance = size - 1
+
   def to: Tile = tiles.last
 
   def trip = tiles.tail.init

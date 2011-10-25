@@ -16,6 +16,24 @@ case class World(rows: Int, cols: Int) {
     sqrt(pow(min(dRow, rows - dRow), 2) + pow(min(dCol, cols - dCol), 2))
   }
 
+  def relativeTo(one: Tile, other: Tile): (Int, Int) = {
+    val horizontal = if(one.row < other.row) {
+      if ((other.row - one.row) <= rows / 2) other.row - one.row
+      else -one.row - (rows - other.row)
+    } else {
+      if ((one.row - other.row) <= rows / 2) other.row - one.row
+      else (rows - one.row) + other.row
+    }
+    val vertical = if(one.col < other.col) {
+      if ((other.col - one.col) <= cols / 2) other.col - one.col
+      else -one.col - (cols - other.col)
+    } else {
+      if ((one.col - other.col) <= cols / 2) other.col - one.col
+      else (cols - one.col) + other.col
+    }
+    (horizontal, vertical)
+  }
+
   def nsDirection(one: Tile, other: Tile): Option[CardinalPoint] =
     if (one.row < other.row) {
       if (other.row - one.row >= rows / 2) Some(North) else Some(South)

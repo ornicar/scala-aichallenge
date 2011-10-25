@@ -22,28 +22,27 @@ class Assigner(game: Game) {
   def idle(ants: Set[MyAnt], assignements: Set[Assignement]): Set[MyAnt] =
     ants -- (assignements map (_.ant))
 
-  def electFeeders(myAnts: Set[MyAnt], foods: List[Food]): Set[Assignement] = (myAnts, foods) match {
-    case (ants, _) if ants.isEmpty => Set()
-    case (_, Nil) => Set()
-    case (ants, food :: otherFoods) => this nearest ants.toSeq from food match {
-      case None => electFeeders(ants, otherFoods)
-      case Some(ant) => {
-        electFeeders(ants - ant, otherFoods) + Assignement(ant, GetFood(food))
-      }
-    }
+  def electFeeders(myAnts: Set[MyAnt], foods: List[Food]): Set[Assignement] = {
+    Set.empty
+    //val foodNearestAnts: List[List[(MyAnt, Int)]] = food map nearest
+    //val selectedAnts: List[Ant] = {
+      //for {
+        //foodAntDistances <- foodNearestAnts
+        //(ant, distance) <- foodAntDistances
+      //} yield ant
+    //}.unique
+    //val antsFood: List[(MyAnt, Food)] = for {
+      //ant <- selectedAnts
+      //food = foods minBy (f =>
   }
 
   def electExplorers(ants: Set[MyAnt]): Set[Assignement] =
     ants map { Assignement(_, Explore()) }
 
-  def nearest(objs: Seq[MyAnt]) = new {
-    def from(tile: Tile): Option[MyAnt] = {
-      val objPaths: Seq[(MyAnt, Path)] = for {
-        obj <- objs
-        if (world.distanceFrom(obj, tile)) < 14
-        path <- pathFinder from obj to tile
-      } yield (obj, path)
-      objPaths.sortWith{ case (a, b) => a._2.size < b._2.size }.headOption map (_._1)
-    }
+  def nearestAnts(ants: List[MyAnt], to: Tile): List[(MyAnt, Int)] = {
+    ants sortBy { -world.distanceFrom(_, to) } take 8 map { ant =>
+      (ant, pathFinder.search(ant, to))
+    } filterNot (_._2.isEmpty) map { case (a, p) => (a, p.get.distance) }
   }
 }
+

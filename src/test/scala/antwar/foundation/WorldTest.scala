@@ -8,14 +8,23 @@ class WorldTest extends FunSuite {
 
   private val world = World(30, 30)
 
+  test("relativeTo no torus") {
+    assert(world.relativeTo(Tile(10, 10), Tile(15, 15)) === (5, 5))
+    assert(world.relativeTo(Tile(10, 10), Tile(5, 5)) === (-5, -5))
+    assert(world.relativeTo(Tile(10, 10), Tile(5, 15)) === (-5, 5))
+  }
+
+  test("relativeTo with torus") {
+    assert(world.relativeTo(Tile(5, 5), Tile(25, 25)) === (-10, -10))
+    assert(world.relativeTo(Tile(25, 25), Tile(5, 5)) === (10, 10))
+    assert(world.relativeTo(Tile(5, 25), Tile(25, 5)) === (-10, 10))
+  }
+
   test("flyDistanceFrom straight no torus") {
     assert(world.flyDistanceFrom(Tile(10, 10), Tile(15, 10)) === 5)
     assert(world.flyDistanceFrom(Tile(10, 10), Tile(10, 15)) === 5)
     assert(world.flyDistanceFrom(Tile(10, 10), Tile(5, 10)) === 5)
     assert(world.flyDistanceFrom(Tile(10, 10), Tile(15, 10)) === 5)
-  }
-
-  test("flyDistanceFrom diagonal no torus") {
   }
 
   test("flyDistanceFrom straight with torus") {
