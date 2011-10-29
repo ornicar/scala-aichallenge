@@ -47,7 +47,7 @@ class PathFinderDesertTorusTest extends PathFinderTest {
                            ......
                            .f....
                            ......""")
-    assert(path === "nnnee")
+    assert(path === "eesss")
   }
 
   test("Find south-west diagonal") {
@@ -55,8 +55,8 @@ class PathFinderDesertTorusTest extends PathFinderTest {
                            .....f
                            ......
                            ......
-                           .a....
-                           ......""")
-    assert(path === "sssww")
+                           ......
+                           .a....""")
+    assert(path === "ssww")
   }
 }

@@ -7,17 +7,30 @@ import org.scalatest._
 
 class FoodAssignerTest extends FunSuite {
 
-  //f1 (A, 5) (B, 7) (C, 9)
-  //f2 (A, 4) (D, 8)
-  //f3 (B, 5)
-  //f4 (B, 6)
+  test("Assign only one food to one ant") {
+    val foodsAntsDist = List(
+      Map("A" -> 5)
+    )
+    assert(FoodAssigner.assign(foodsAntsDist) === List(Some("A")))
+  }
 
-  //f1 C
-  //f2 A
-  //f3 B
-  //f4 --
+  test("Assign only one food to 3 ant") {
+    val foodsAntsDist = List(
+      Map("A" -> 5, "B" -> 2, "C" -> 9)
+    )
+    assert(FoodAssigner.assign(foodsAntsDist) === List(Some("B")))
+  }
 
-  test("Assign best food ants") {
+  test("Assign 3 foods to 1 ant") {
+    val foodsAntsDist = List(
+      Map("A" -> 5),
+      Map("A" -> 4),
+      Map("A" -> 7)
+    )
+    assert(FoodAssigner.assign(foodsAntsDist) === List(None, Some("A"), None))
+  }
+
+  test("Assign 4 foods to 4 ants") {
     val foodsAntsDist = List(
       Map("A" -> 5, "B" -> 7, "C" -> 9),
       Map("A" -> 4, "D" -> 8),

@@ -40,10 +40,3 @@ case class PathFinder(game: Game) {
     } yield ((row, col), !(game free tile))
   }.toMap
 }
-
-
-
-//ooo o
-//o ooo
-//o  o
-//ooooo

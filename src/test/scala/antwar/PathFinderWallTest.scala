@@ -50,24 +50,24 @@ class PathFinderWallTest extends PathFinderTest {
   }
 
   test("Find no path north west") {
-    val path = findPath("""wwwwww
-                           f.....
-                           ..w...
-                           .w.w..
-                           w...ww
-                           .....a
-                           wwwwww""")
+    val path = findPath("""wwwwwww
+                           wf.....w
+                           w..w...w
+                           w.w.w..w
+                           ww...www
+                           w.....aw
+                           wwwwwwww""")
     assert(path === "")
   }
 
   test("Find no path south east") {
-    val path = findPath("""wwwwww
-                           a.....
-                           ..w...
-                           .w.w..
-                           w...ww
-                           .....f
-                           wwwwww""")
+    val path = findPath("""wwwwwwww
+                           wa.....w
+                           w..w...w
+                           w.w.w..w
+                           ww...www
+                           w.....fw
+                           wwwwwwww""")
     assert(path === "")
   }
 
