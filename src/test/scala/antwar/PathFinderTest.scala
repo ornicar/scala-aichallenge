@@ -13,7 +13,8 @@ abstract class PathFinderTest extends FunSuite {
     val s = makeScene(str)
     val finder = PathFinder(s.game)
     val path = finder.search(s.ant, s.food)
-    path map (_.compactString) getOrElse ""
+    val string = path map (_.compactString) getOrElse ""
+    string.sorted
   }
 
   protected def makeScene(str: String): Scene = {

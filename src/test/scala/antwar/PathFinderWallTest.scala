@@ -15,7 +15,7 @@ class PathFinderWallTest extends PathFinderTest {
                            wwww.w
                            a.....
                            wwwwww""")
-    assert(path === "eeeennne")
+    assert(path === "eeeeennn")
   }
 
   test("Find north west path, horizontal wall") {
@@ -25,7 +25,7 @@ class PathFinderWallTest extends PathFinderTest {
                            .wwwww
                            .....a
                            wwwwww""")
-    assert(path === "wwwwwnnn")
+    assert(path === "nnnwwwww")
   }
 
   test("Find south west path, horizontal wall") {
@@ -35,7 +35,7 @@ class PathFinderWallTest extends PathFinderTest {
                            .wwwww
                            .....f
                            wwwwww""")
-    assert(path === "ssseeeee")
+    assert(path === "eeeeesss")
   }
 
   test("Find north west path, diagonal walls") {
@@ -46,7 +46,7 @@ class PathFinderWallTest extends PathFinderTest {
                            ....ww
                            .....a
                            wwwwww""")
-    assert(path === "wwnwnwnnw")
+    assert(path === "nnnnwwwww")
   }
 
   test("Find no path north west") {

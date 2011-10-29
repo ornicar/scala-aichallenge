@@ -47,7 +47,7 @@ class PathFinderDesertTest extends PathFinderTest {
                            w....w
                            wa...w
                            wwwwww""")
-    assert(path === "nnneee")
+    assert(path === "eeennn")
   }
 
   test("Find south-west diagonal") {
