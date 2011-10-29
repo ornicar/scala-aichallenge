@@ -1,38 +1,44 @@
 package antwar
 
-object FoodAssigner {
+import foundation.Logger
 
-  def assign[Ant](foodsAntsDist: List[Map[Ant, Int]]): List[Option[Ant]] = {
+class FoodAssigner[Ant] {
 
-    val foodsAnts: List[List[Ant]] = foodsAntsDist map { as => (as map (_._1)).toList }
+  val max = 99
 
-    val foodsAntOptions: List[List[Option[Ant]]] = foodsAnts map { fas =>
+  type AntOptions = List[Option[Ant]]
+
+  def assign(foodsAntsDist: List[Map[Ant, Int]]): AntOptions = {
+
+    val foodsCandidates: List[AntOptions] = foodsAntsDist map { as =>
+      (as map (_._1)).toList
+    } map { fas =>
       None :: (fas map { Some(_) })
     }
 
-    def assignements(fas: List[List[Option[Ant]]]): List[List[Option[Ant]]] = {
-      fas match {
+    def assignements(fcs: List[AntOptions]): List[AntOptions] = {
+      fcs match {
         case Nil => List(Nil)
-        case foodAnts :: rest => {
+        case foodCandidates :: rest => {
           for {
             solution <- assignements(rest)
-            candidate <- foodAnts
+            candidate <- foodCandidates
             if (candidate.isEmpty || !(solution contains candidate))
           } yield candidate :: solution
         }
       }
     }
-    val solutions = assignements(foodsAntOptions)
 
-    def cost(solution: List[Option[Ant]], dists: List[Map[Ant, Int]]): Int = solution match {
+    val solutions = assignements(foodsCandidates)
+
+    def cost(solution: AntOptions, dists: List[Map[Ant, Int]]): Int = solution match {
       case Nil => 0
-      case ant :: rest => cost(rest, dists.tail) + (ant match {
-        case None =>  999
-        case Some(a) => dists.head(a)
-      })
+      case ant :: rest => cost(rest, dists.tail) + (ant map dists.head getOrElse max)
     }
 
-    solutions minBy { cost(_, foodsAntsDist) }
+    val solution = solutions minBy { cost(_, foodsAntsDist) }
+
+    solution
   }
 
 }

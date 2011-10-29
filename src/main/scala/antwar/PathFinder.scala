@@ -19,7 +19,7 @@ case class PathFinder(game: Game) {
         case Nil => None
         case solution => Some(makePath(f.pos, solution))
       }
-      Logger("path")("%s %s %s".format(f, t, somePath map (_.tiles)))
+      //Logger("path")("%s %s %s".format(f, t, somePath map (_.tiles)))
       somePath
     }
   }

@@ -9,6 +9,7 @@ class Assigner(game: Game) {
   val ants = board.myAntSet
   val foods = board.foodList
   val pathFinder = PathFinder(game)
+  val foodAssigner = new FoodAssigner[MyAnt]
 
   def distribute: List[Assignement] = {
     val feeders = electFeeders(ants, foods)
@@ -23,26 +24,24 @@ class Assigner(game: Game) {
     ants -- (assignements map (_.ant))
 
   def electFeeders(myAnts: Set[MyAnt], foods: List[Food]): Set[Assignement] = {
-    Set.empty
-    //val foodNearestAnts: List[List[(MyAnt, Int)]] = food map nearest
-    //val selectedAnts: List[Ant] = {
-      //for {
-        //foodAntDistances <- foodNearestAnts
-        //(ant, distance) <- foodAntDistances
-      //} yield ant
-    //}.unique
-    //val antsFood: List[(MyAnt, Food)] = for {
-      //ant <- selectedAnts
-      //food = foods minBy (f =>
+
+    val foodsAntDists: List[Map[MyAnt, Int]] = foods map { nearestAnts(myAnts, _) }
+
+    val assignements = foods zip foodAssigner.assign(foodsAntDists) map {
+      case (food, None) => None
+      case (food, Some(ant)) => Some(Assignement(ant, GetFood(food)))
+    }
+
+    (assignements filterNot (_.isEmpty) map (_.get)).toSet
   }
 
   def electExplorers(ants: Set[MyAnt]): Set[Assignement] =
     ants map { Assignement(_, Explore()) }
 
-  def nearestAnts(ants: List[MyAnt], to: Tile): List[(MyAnt, Int)] = {
-    ants sortBy { -world.distanceFrom(_, to) } take 8 map { ant =>
+  def nearestAnts(ants: Set[MyAnt], to: Tile): Map[MyAnt, Int] = {
+    (ants.toList sortBy { -world.distanceFrom(_, to) } take 10 map { ant =>
       (ant, pathFinder.search(ant, to))
-    } filterNot (_._2.isEmpty) map { case (a, p) => (a, p.get.distance) }
+    } filterNot (_._2.isEmpty) map { case (a, p) => (a, p.get.distance) }).toMap
   }
 }
 

@@ -5,20 +5,22 @@ import foundation._
 
 import org.scalatest._
 
-class FoodAssignerTest extends FunSuite {
+class foodAssignerTest extends FunSuite {
+
+  val foodAssigner = new FoodAssigner[String]
 
   test("Assign only one food to one ant") {
     val foodsAntsDist = List(
       Map("A" -> 5)
     )
-    assert(FoodAssigner.assign(foodsAntsDist) === List(Some("A")))
+    assert(foodAssigner.assign(foodsAntsDist) === List(Some("A")))
   }
 
   test("Assign only one food to 3 ant") {
     val foodsAntsDist = List(
       Map("A" -> 5, "B" -> 2, "C" -> 9)
     )
-    assert(FoodAssigner.assign(foodsAntsDist) === List(Some("B")))
+    assert(foodAssigner.assign(foodsAntsDist) === List(Some("B")))
   }
 
   test("Assign 3 foods to 1 ant") {
@@ -27,7 +29,7 @@ class FoodAssignerTest extends FunSuite {
       Map("A" -> 4),
       Map("A" -> 7)
     )
-    assert(FoodAssigner.assign(foodsAntsDist) === List(None, Some("A"), None))
+    assert(foodAssigner.assign(foodsAntsDist) === List(None, Some("A"), None))
   }
 
   test("Assign 4 foods to 4 ants") {
@@ -37,7 +39,7 @@ class FoodAssignerTest extends FunSuite {
       Map("B" -> 5),
       Map("B" -> 6)
     )
-    assert(FoodAssigner.assign(foodsAntsDist) === List(Some("C"), Some("A"), Some("B"), None))
+    assert(foodAssigner.assign(foodsAntsDist) === List(Some("C"), Some("A"), Some("B"), None))
   }
 
 }
