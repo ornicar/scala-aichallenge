@@ -2,26 +2,37 @@ package antwar.foundation
 
 case class Repartition(world: World, viewRadius: Int) {
 
-  case class Sector(center: Tile)
+  def sectorOf(tile: Tile): Sector =
+    sectors(centers minBy { world.distanceFrom(_, tile) })
 
-  val sectors: List[Sector] = {
+  // all sectors, the nearest from this tile first
+  def nearestSectors(tile: Tile): List[Sector] =
+    sectors.values.toList sortBy { s => world.distanceFrom(s.center, tile) }
+
+  val sectors: Map[Tile, Sector] = {
 
       val rowStep = world.rows.toFloat / (world.rows / viewRadius)
       val colStep = world.cols.toFloat / (world.cols / viewRadius)
       val shifts = (List.fill(world.rows)(List(0, rowStep / 2))).flatten
 
-      for {
-      (row, index) <- (.0 until world.rows by rowStep).toList.zipWithIndex
-      shift = shifts(index).toFloat
-      col <- (shift until world.cols + shift by colStep).toList
-      tile = Tile(row.toInt, col.toInt)
-    } yield Sector(tile)
+      val pairs = for {
+        (row, index) <- (.0 until world.rows by rowStep).toList.zipWithIndex
+        shift = shifts(index).toFloat
+        col <- (shift until world.cols + shift by colStep).toList
+        tile = Tile(row.toInt, col.toInt)
+      } yield (tile, Sector(tile))
+
+      pairs.toMap
   }
 
-  def isSectorCenter(tile: Tile) = sectors.map(_.center) contains tile
+  val centers: List[Tile] = sectors.keys.toList
+
+  def isSectorCenter(tile: Tile) = centers contains tile
 
   override def toString = {
     val chars = world.tiles map { t => if (isSectorCenter(t)) 'x' else '.' }
     ((chars grouped world.cols) map (_ mkString " ")) mkString "\n"
   }
 }
+
+case class Sector(center: Tile)
