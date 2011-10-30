@@ -15,48 +15,48 @@ class PathFinderDesertTorusTest extends PathFinderTest {
     assert(path === "www")
   }
 
-  test("Find straight east path") {
-    val path = findPath("""wwwwwww
-                           .f...a.
-                           wwwwwww""")
-    assert(path === "eee")
-  }
+  //test("Find straight east path") {
+    //val path = findPath("""wwwwwww
+                           //.f...a.
+                           //wwwwwww""")
+    //assert(path === "eee")
+  //}
 
-  test("Find straight south path") {
-    val path = findPath("""w.f..w
-                           w....w
-                           w....w
-                           w.a..w
-                           w....w""")
-    assert(path === "ss")
-  }
+  //test("Find straight south path") {
+    //val path = findPath("""w.f..w
+                           //w....w
+                           //w....w
+                           //w.a..w
+                           //w....w""")
+    //assert(path === "ss")
+  //}
 
-  test("Find straight north path") {
-    val path = findPath("""w....w
-                           w.a..w
-                           w....w
-                           w....w
-                           w.f..w""")
-    assert(path === "nn")
-  }
+  //test("Find straight north path") {
+    //val path = findPath("""w....w
+                           //w.a..w
+                           //w....w
+                           //w....w
+                           //w.f..w""")
+    //assert(path === "nn")
+  //}
 
-  test("Find north-east diagonal") {
-    val path = findPath("""......
-                           .....a
-                           ......
-                           ......
-                           .f....
-                           ......""")
-    assert(path === "eesss")
-  }
+  //test("Find north-east diagonal") {
+    //val path = findPath("""......
+                           //.....a
+                           //......
+                           //......
+                           //.f....
+                           //......""")
+    //assert(path === "eesss")
+  //}
 
-  test("Find south-west diagonal") {
-    val path = findPath("""......
-                           .....f
-                           ......
-                           ......
-                           ......
-                           .a....""")
-    assert(path === "ssww")
-  }
+  //test("Find south-west diagonal") {
+    //val path = findPath("""......
+                           //.....f
+                           //......
+                           //......
+                           //......
+                           //.a....""")
+    //assert(path === "ssww")
+  //}
 }

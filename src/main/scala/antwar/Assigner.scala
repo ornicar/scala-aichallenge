@@ -8,40 +8,64 @@ class Assigner(game: Game) {
   val board = game.board
   val ants = board.myAntSet
   val foods = board.foodList
-  val pathFinder = PathFinder(game)
-  val foodAssigner = new FoodAssigner[MyAnt]
+  val pathFinder = new PathFinder(world, board.water.keySet)
+  val goalAssigner = new GoalAssigner[MyAnt]
 
   def distribute: List[Assignement] = {
-    val feeders = electFeeders(ants, foods)
-    val explorers = electExplorers(idle(ants, feeders))
 
-    Logger(this.getClass)("%d foods, %d ants, %d feeders, %d explorers".format(foods.size, ants.size, feeders.size, explorers.size))
+    val feeders: Set[Assignement] = electFeeders(ants, foods)
 
-    feeders.toList ::: explorers.toList
+    val persistents: Set[Assignement] = {
+      for {
+        (ant, job) <- game.memory.antJobs
+        if !(feeders map (_.ant) contains ant)
+        if job valid game
+      } yield Assignement(ant, job)
+    }.toSet
+
+    val patrollers: Set[Assignement] = electPatrollers(
+      idle(ants, feeders ++ persistents),
+      game.emptyRepartition
+    )
+
+    Logger(this.getClass)("%d foods, %d ants, %d feeders, %d persistents, %d patrollers".format(foods.size, ants.size, feeders.size, persistents.size, patrollers.size))
+
+    feeders.toList ::: persistents.toList ::: patrollers.toList
   }
 
   def idle(ants: Set[MyAnt], assignements: Set[Assignement]): Set[MyAnt] =
     ants -- (assignements map (_.ant))
 
-  def electFeeders(myAnts: Set[MyAnt], foods: List[Food]): Set[Assignement] = {
+  def electFeeders(ants: Set[MyAnt], foods: List[Food]): Set[Assignement] =
+    electMovers(ants, foods) { GetFood(_) }
 
-    val foodsAntDists: List[Map[MyAnt, Int]] = foods map { nearestAnts(myAnts, _) }
+  def electPatrollers(ants: Set[MyAnt], repartition: Repartition): Set[Assignement] =
+    electMovers(ants, repartition.sectors.values.toList) { Patrol(_) }
 
-    val assignements = foods zip foodAssigner.assign(foodsAntDists) map {
-      case (food, None) => None
-      case (food, Some(ant)) => Some(Assignement(ant, GetFood(food)))
+  def electMovers[A <: Positionable, B <: Job]
+    (ants: Set[MyAnt], goals: List[A])(builder: A => B) = {
+
+    val goalsAntDists: List[Map[MyAnt, Int]] = goals map { goal =>
+      nearestAnts(ants, goal)
     }
 
-    (assignements filterNot (_.isEmpty) map (_.get)).toSet
+    val assignements = goals zip goalAssigner.assign(goalsAntDists) map {
+      case (goal, None) => None
+      case (goal, Some(ant)) => Some(Assignement(ant, builder(goal)))
+    }
+
+    assignements.flatten.toSet
   }
 
-  def electExplorers(ants: Set[MyAnt]): Set[Assignement] =
-    ants map { Assignement(_, Explore()) }
-
   def nearestAnts(ants: Set[MyAnt], to: Tile): Map[MyAnt, Int] = {
-    (ants.toList sortBy { -world.distanceFrom(_, to) } take 10 map { ant =>
+    val nearAnts = ants.toList sortBy { world.distanceFrom(_, to) }
+    val paths = nearAnts take 2 map { ant =>
       (ant, pathFinder.search(ant, to))
-    } filterNot (_._2.isEmpty) map { case (a, p) => (a, p.get.distance) }).toMap
+    }
+    val distances = paths filterNot (_._2.isEmpty) map {
+      case (a, p) => (a, p.get.distance)
+    }
+    distances.toMap
   }
 }
 

@@ -3,18 +3,18 @@ package antwar
 import foundation._
 import scala.math
 
-case class PathFinder(game: Game) {
+class PathFinder(world: World, water: Set[Tile]) {
 
-  val max = 12
+  val max = 14
 
-  val rows = game.world.rows
-  val cols = game.world.cols
+  val rows = world.rows
+  val cols = world.cols
 
   def search(f: Tile, t: Tile) = {
-    if (game.world.distanceFrom(f, t) > max) None
+    if (world.distanceFrom(f, t) > max) None
     else {
       val astarWorld = makeWorldAround(f.pos)
-      val relativeTo = game.world.relativeTo(f, t)
+      val relativeTo = world.relativeTo(f, t)
       val somePath = Astar.search(astarWorld, (0, 0), relativeTo) match {
         case Nil => None
         case solution => Some(makePath(f.pos, solution))
@@ -28,7 +28,7 @@ case class PathFinder(game: Game) {
     val tiles = solution map { pos =>
       Tile((a._1 + pos._1) % rows, (a._2 + pos._2) % cols)
     }
-    Path(game.world, Tile(a) :: tiles)
+    Path(world, Tile(a) :: tiles)
   }
 
   private def makeWorldAround(a: Astar.Pos): Astar.World = {
@@ -37,6 +37,6 @@ case class PathFinder(game: Game) {
       col <- -max to max
       if (math.abs(row) + math.abs(col) <= max)
       tile = Tile((a._1 + row) % rows, (a._2 + col) % cols)
-    } yield ((row, col), !(game free tile))
+    } yield ((row, col), water contains tile)
   }.toMap
 }

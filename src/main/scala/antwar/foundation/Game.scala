@@ -23,11 +23,13 @@ case class Game(
 
   val knownWater: List[Tile] = board.water.keys.toList
 
+  val world = World(parameters.rows, parameters.cols)
+
+  val fullRepartition: Repartition = Repartition.full(world, parameters.viewRadius)
+
+  val emptyRepartition: Repartition = Repartition.empty(fullRepartition, memory.patrolledSectors)
+
   def tiles = world.tiles
-
-  lazy val world = World(parameters.rows, parameters.cols)
-
-  lazy val repartition = world repartition parameters.viewRadius
 
   def free(tile: Tile) = !(board.myAnts contains tile) && !(board.water contains tile)
 

@@ -11,7 +11,7 @@ abstract class PathFinderTest extends FunSuite {
 
   protected def findPath(str: String): String = {
     val s = makeScene(str)
-    val finder = PathFinder(s.game)
+    val finder = new PathFinder(s.game.world, s.game.board.water.keySet)
     val path = finder.search(s.ant, s.food)
     val string = path map (_.compactString) getOrElse ""
     string.sorted

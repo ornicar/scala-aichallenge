@@ -5,9 +5,9 @@ import foundation._
 
 import org.scalatest._
 
-class foodAssignerTest extends FunSuite {
+class GoalAssignerTest extends FunSuite {
 
-  val foodAssigner = new FoodAssigner[String]
+  val foodAssigner = new GoalAssigner[String]
 
   test("Assign only one food to one ant") {
     val foodsAntsDist = List(
@@ -34,7 +34,7 @@ class foodAssignerTest extends FunSuite {
 
   test("Assign 4 foods to 4 ants") {
     val foodsAntsDist = List(
-      Map("A" -> 5, "B" -> 7, "C" -> 9),
+      Map("A" -> 5, "B" -> 7, "C" -> 8),
       Map("A" -> 4, "D" -> 8),
       Map("B" -> 5),
       Map("B" -> 6)

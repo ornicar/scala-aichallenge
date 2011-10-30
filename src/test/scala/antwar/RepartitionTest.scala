@@ -7,7 +7,7 @@ import org.scalatest._
 
 class RepartitionTest extends FunSuite {
 
-  val repartition = Repartition(World(29, 34), 7)
+  val repartition = FullRepartition(World(29, 34), 55)
 
   test("Find wich sector a tile belongs to") {
 

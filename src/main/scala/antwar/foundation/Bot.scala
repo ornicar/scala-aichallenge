@@ -4,5 +4,5 @@ import antwar.Memory
 
 trait Bot {
 
-  def ordersFrom(game: Game): List[Order]
+  def ordersFrom(game: Game): (List[Order], Memory)
 }

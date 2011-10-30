@@ -11,8 +11,6 @@ case class World(rows: Int, cols: Int) {
     } yield Tile(row, col)
   }.toList
 
-  def repartition(viewRadius: Int) = Repartition(this, viewRadius)
-
   def distanceFrom(one: Tile, other: Tile): Int = {
     val dRow = abs(one.row - other.row)
     val dCol = abs(one.col - other.col)

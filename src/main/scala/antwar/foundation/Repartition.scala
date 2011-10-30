@@ -1,6 +1,14 @@
 package antwar.foundation
 
-case class Repartition(world: World, viewRadius: Int) {
+import scala.math.{sqrt, min}
+
+trait Repartition {
+
+  def world: World
+
+  val sectors: Map[Tile, Sector]
+
+  lazy val centers: List[Tile] = sectors.keys.toList
 
   def sectorOf(tile: Tile): Sector =
     sectors(centers minBy { world.distanceFrom(_, tile) })
@@ -9,10 +17,35 @@ case class Repartition(world: World, viewRadius: Int) {
   def nearestSectors(tile: Tile): List[Sector] =
     sectors.values.toList sortBy { s => world.distanceFrom(s.center, tile) }
 
+  def isSectorCenter(tile: Tile) = centers contains tile
+
+  override def toString = {
+    val chars = world.tiles map { t => if (isSectorCenter(t)) 'x' else '.' }
+    ((chars grouped world.cols) map (_ mkString " ")) mkString "\n"
+  }
+}
+
+object Repartition {
+
+  def full(world: World, viewRadius: Int) = FullRepartition(world, viewRadius)
+
+  def empty(full: Repartition, patrolled: Set[Sector]) = EmptyRepartition(
+    full.world,
+    (full.sectors filterNot {
+      case (tile, sector) => patrolled contains sector
+    })
+  )
+}
+
+case class EmptyRepartition(world: World, sectors: Map[Tile, Sector]) extends Repartition
+
+case class FullRepartition(world: World, viewRadius: Int) extends Repartition {
+
   val sectors: Map[Tile, Sector] = {
 
-      val rowStep = world.rows.toFloat / (world.rows / viewRadius)
-      val colStep = world.cols.toFloat / (world.cols / viewRadius)
+      val radius = sqrt(viewRadius).toInt
+      val rowStep = min(world.rows, world.rows.toFloat / (world.rows / radius))
+      val colStep = min(world.cols, world.cols.toFloat / (world.cols / radius))
       val shifts = (List.fill(world.rows)(List(0, rowStep / 2))).flatten
 
       val pairs = for {
@@ -24,15 +57,9 @@ case class Repartition(world: World, viewRadius: Int) {
 
       pairs.toMap
   }
-
-  val centers: List[Tile] = sectors.keys.toList
-
-  def isSectorCenter(tile: Tile) = centers contains tile
-
-  override def toString = {
-    val chars = world.tiles map { t => if (isSectorCenter(t)) 'x' else '.' }
-    ((chars grouped world.cols) map (_ mkString " ")) mkString "\n"
-  }
 }
 
-case class Sector(center: Tile)
+case class Sector(center: Tile) extends Positionable {
+
+  val tile = center
+}

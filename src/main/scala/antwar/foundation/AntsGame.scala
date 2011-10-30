@@ -25,22 +25,23 @@ class AntsGame(in: InputStream = System.in, out: OutputStream = System.out) {
     timer.log()
 
     @tailrec
-    def turn(gameLike: GameLike) {
+    def turn(gameLike: GameLike, memory: Memory) {
       val parsed = parser.turn
       val timer = Timer("total")
-      val game = Timer.monitor("build") { builder(parsed, gameLike) }
+      val game = Timer.monitor("build") { builder(parsed, gameLike, memory) }
       game match {
         case None =>
         case Some(game) => {
-          Timer.monitor("AI") { writeOrders(bot ordersFrom game) }
+          val (orders, memory) = Timer.monitor("AI") { bot ordersFrom game  }
+          writeOrders(orders)
           Logger.info("------------------------------------------------------- %d | %s".format(game.turn,  timer))
-          turn(game)
+          turn(game, memory)
         }
       }
     }
 
     try {
-      turn(setup)
+      turn(setup, setup.memory)
     } catch {
       case e => logException(e)
     }

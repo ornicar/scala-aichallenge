@@ -32,7 +32,7 @@ class GameBuilder(parameters: GameParameters) extends Builder {
   val tileRegex = """(\d+)\s(\d+)""".r
   val ownRegex = """(\d+)\s(\d+)\s(\d+)""".r
 
-  def apply(lines: List[String], from: GameLike): Option[Game] = {
+  def apply(lines: List[String], from: GameLike, memory: Memory): Option[Game] = {
 
     if (lines.head == "end") return None
 
@@ -76,7 +76,7 @@ class GameBuilder(parameters: GameParameters) extends Builder {
     val allWater = water.toList ::: from.knownWater
     val board = Board(myAnts.toList, enemyAnts.toList, allWater, food.toList, hives.toList)
     val vision = makeVision(board)
-    val memory = from.memory seeing vision
+    val newMemory = memory seeing vision withAnts board.myAnts.values.toSet
 
     Some(Game(turn, from.parameters, board, memory, vision))
   }
@@ -100,7 +100,7 @@ class SetupBuilder extends Builder {
 
     val parameters = GameParameters(m("loadtime"), m("turntime"), m("rows"), m("cols"), m.get("player_seed") getOrElse(42), m("turns"), m("viewradius2"), m("attackradius2"), m("spawnradius2"))
 
-    val memory = Memory(tiles)
+    val memory = Memory(tiles, Map.empty)
 
     GameSetup(parameters, memory)
   }
