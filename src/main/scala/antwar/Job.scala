@@ -14,18 +14,11 @@ trait Job {
 
 case class Explore() extends Job {
 
-  def aim(ant: MyAnt, game: Game) = any(ant, game)
-  def aim2(ant: MyAnt, game: Game) = {
-    game choices ant match {
-      case Nil => None
-      case choices => {
-        val informedChoices = choices map { aim =>
-          val tile = game.world.tile(aim, 1) of ant
-          (aim, game.isolation(tile))
-        }
-        Some(informedChoices.maxBy(_._2)._1)
-      }
-    }
+  //def aim(ant: MyAnt, game: Game) = any(ant, game)
+  def aim(ant: MyAnt, game: Game) = {
+    val goal = Tile(31, 23)
+    val aim = PathFinder(game).search(ant, goal) map { _.aims.head }
+    aim orElse any(ant, game)
   }
 }
 
