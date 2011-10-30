@@ -4,6 +4,15 @@ import scala.math.{abs,min,pow,sqrt}
 
 case class World(rows: Int, cols: Int) {
 
+  val tiles: List[Tile] = {
+    for {
+      row <- (0 until rows)
+      col <- (0 until cols)
+    } yield Tile(row, col)
+  }.toList
+
+  def repartition(viewRadius: Int) = Repartition(this, viewRadius)
+
   def distanceFrom(one: Tile, other: Tile): Int = {
     val dRow = abs(one.row - other.row)
     val dCol = abs(one.col - other.col)

@@ -2,6 +2,7 @@ package antwar.foundation
 
 import antwar.Memory
 import scala.collection.mutable
+import scala.math.{sqrt, pow}
 
 trait Builder {
 
@@ -19,11 +20,11 @@ class GameBuilder(parameters: GameParameters) extends Builder {
   // precalculate squares around an ant to set as visible
   val visionOffsets: Seq[(Int, Int)] = {
     import parameters._
-    val mx = math.sqrt(viewRadius).toInt
+    val mx = sqrt(viewRadius).toInt
     for {
       dRow <- (-mx to mx+1)
       dCol <- (-mx to mx+1)
-      d = math.pow(dRow, 2) + math.pow(dCol, 2)
+      d = pow(dRow, 2) + pow(dCol, 2)
       if d < viewRadius
     } yield (dRow, dCol)
   }
@@ -97,7 +98,7 @@ class SetupBuilder extends Builder {
 
     val tiles = (for { row <- (0 to m("rows") -1); col <- (0 to m("cols") -1) } yield Tile(row, col)).toSet
 
-    val parameters = GameParameters(m("loadtime"), m("turntime"), m("rows"), m("cols"), m.get("player_seed") getOrElse(42), m("turns"), m("viewradius2"), m("attackradius2"), m("spawnradius2"), tiles)
+    val parameters = GameParameters(m("loadtime"), m("turntime"), m("rows"), m("cols"), m.get("player_seed") getOrElse(42), m("turns"), m("viewradius2"), m("attackradius2"), m("spawnradius2"))
 
     val memory = Memory(tiles)
 
