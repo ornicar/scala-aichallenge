@@ -17,18 +17,6 @@ trait Builder {
 
 class GameBuilder(parameters: GameParameters) extends Builder {
 
-  // precalculate squares around an ant to set as visible
-  val visionOffsets: Seq[(Int, Int)] = {
-    import parameters._
-    val mx = sqrt(viewRadius).toInt
-    for {
-      dRow <- (-mx to mx+1)
-      dCol <- (-mx to mx+1)
-      d = pow(dRow, 2) + pow(dCol, 2)
-      if d < viewRadius
-    } yield (dRow, dCol)
-  }
-
   val tileRegex = """(\d+)\s(\d+)""".r
   val ownRegex = """(\d+)\s(\d+)\s(\d+)""".r
 
@@ -75,19 +63,16 @@ class GameBuilder(parameters: GameParameters) extends Builder {
 
     val allWater = water.toList ::: from.knownWater
     val board = Board(myAnts.toList, enemyAnts.toList, allWater, food.toList, hives.toList)
-    val vision = makeVision(board)
+    val vision = {
+      for {
+        Tile(aRow, aCol) <- board.myAnts.keys
+        (vRow, vCol) <- parameters.visionOffsets
+      } yield Tile((aRow + vRow) % parameters.rows, (aCol + vCol) % parameters.cols)
+    }.toSet
     val newMemory = memory seeing vision withAnts board.myAnts.values.toSet
 
     Some(Game(turn, from.parameters, board, memory, vision))
   }
-
-  // All tiles actually visibles
-  private def makeVision(board: Board): Set[Tile] = {
-    for {
-      Tile(aRow, aCol) <- board.myAnts.keys
-      (vRow, vCol) <- visionOffsets
-    } yield Tile((aRow + vRow) % parameters.rows, (aCol + vCol) % parameters.cols)
-  }.toSet
 }
 
 class SetupBuilder extends Builder {

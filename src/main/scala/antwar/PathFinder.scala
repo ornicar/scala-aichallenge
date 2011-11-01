@@ -5,12 +5,12 @@ import scala.math
 
 class PathFinder(world: World, water: Set[Tile]) {
 
-  val max = 14
+  val max = 16
 
   val rows = world.rows
   val cols = world.cols
 
-  def search(f: Tile, t: Tile) = {
+  def search(f: Tile, t: Tile): Option[Path] = {
     if (world.distanceFrom(f, t) > max) None
     else {
       val astarWorld = makeWorldAround(f.pos)

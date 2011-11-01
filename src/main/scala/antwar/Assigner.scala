@@ -2,6 +2,8 @@ package antwar
 
 import foundation._
 
+import scala.util.Random.shuffle
+
 class Assigner(game: Game) {
 
   val world = game.world
@@ -11,6 +13,8 @@ class Assigner(game: Game) {
   val pathFinder = new PathFinder(world, board.water.keySet)
   val goalAssigner = new GoalAssigner[MyAnt]
 
+  implicit def assignementsToAnt(as: Set[Assignement]): Set[MyAnt] = as map (_.ant)
+
   def distribute: List[Assignement] = {
 
     val feeders: Set[Assignement] = electFeeders(ants, foods)
@@ -19,16 +23,22 @@ class Assigner(game: Game) {
       for {
         (ant, job) <- game.memory.antJobs
         if !(feeders map (_.ant) contains ant)
-        if job valid game
+        if job.valid(ant, game)
       } yield Assignement(ant, job)
     }.toSet
 
     val patrollers: Set[Assignement] = electPatrollers(
-      idle(ants, feeders ++ persistents),
-      game.emptyRepartition
-    )
+      ants -- feeders -- persistents,
+      game.repartition)
 
     Logger(this.getClass)("%d foods, %d ants, %d feeders, %d persistents, %d patrollers".format(foods.size, ants.size, feeders.size, persistents.size, patrollers.size))
+    Logger("persistents")(persistents)
+
+    val targets = ((patrollers ++ persistents) map { _.job match {
+      case patrol: Patrol => Some(patrol.target)
+      case _ => None
+    }}).flatten
+    Logger("patrol targets")(targets)
 
     feeders.toList ::: persistents.toList ::: patrollers.toList
   }
@@ -39,8 +49,24 @@ class Assigner(game: Game) {
   def electFeeders(ants: Set[MyAnt], foods: List[Food]): Set[Assignement] =
     electMovers(ants, foods) { GetFood(_) }
 
-  def electPatrollers(ants: Set[MyAnt], repartition: Repartition): Set[Assignement] =
-    electMovers(ants, repartition.sectors.values.toList) { Patrol(_) }
+  def electPatrollers(ants: Set[MyAnt], repartition: Repartition): Set[Assignement] = {
+    val assignements = ants map { ant =>
+      val choices = for {
+        sector <- repartition nearestSectors ant drop 1 take 12
+        path <- pathFinder.search(ant, sector)
+        frequentation = game sectorOccupation sector
+      } yield (sector, frequentation, path)
+
+      if (choices.isEmpty) None
+      else {
+        val bestChoice = choices minBy { _._2 }
+        //Logger("choices")((choices map { c => (c._1.center, c._2) }) + " | " + bestChoice._1.center + " " + bestChoice._2)
+        Some(Assignement(ant, (Patrol(bestChoice._1, bestChoice._3))))
+      }
+    }
+
+    assignements.flatten.toSet
+  }
 
   def electMovers[A <: Positionable, B <: Job]
     (ants: Set[MyAnt], goals: List[A])(builder: A => B) = {
@@ -59,7 +85,7 @@ class Assigner(game: Game) {
 
   def nearestAnts(ants: Set[MyAnt], to: Tile): Map[MyAnt, Int] = {
     val nearAnts = ants.toList sortBy { world.distanceFrom(_, to) }
-    val paths = nearAnts take 2 map { ant =>
+    val paths = nearAnts take 3 map { ant =>
       (ant, pathFinder.search(ant, to))
     }
     val distances = paths filterNot (_._2.isEmpty) map {

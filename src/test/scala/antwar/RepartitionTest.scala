@@ -7,13 +7,15 @@ import org.scalatest._
 
 class RepartitionTest extends FunSuite {
 
-  val repartition = FullRepartition(World(29, 34), 55)
+  val (rows, cols, viewRadius) = (29, 34, 55)
+  val repartition = Repartition(World(rows, cols), viewRadius)
 
   test("Find wich sector a tile belongs to") {
 
-    assert(Sector(Tile(0,0)) === (repartition sectorOf Tile(0,0)))
-    assert(Sector(Tile(0,0)) === (repartition sectorOf Tile(2,2)))
-    assert(Sector(Tile(7,3)) === (repartition sectorOf Tile(6,2)))
+    assert(Some(Tile(0,0)) === (repartition sectorOf Tile(0,0) map (_.tile)))
+    assert(Some(Tile(0,0)) === (repartition sectorOf Tile(2,2) map (_.tile)))
+    assert(Some(Tile(7,3)) === (repartition sectorOf Tile(6,2) map (_.tile)))
+    assert(Some(Tile(0,0)) === (repartition sectorOf Tile(28, 33) map (_.tile)))
   }
 
   test("Find nearest sectors") {

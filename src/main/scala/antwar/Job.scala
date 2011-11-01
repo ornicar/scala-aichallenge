@@ -5,7 +5,7 @@ import scala.util.Random.shuffle
 
 trait Job {
 
-  def valid(game: Game): Boolean
+  def valid(ant: MyAnt, game: Game): Boolean
 
   def aim(ant: MyAnt, game: Game): Option[CardinalPoint]
 
@@ -19,11 +19,16 @@ trait Job {
       case Some(aim) if (game choices ant contains aim) => Some(aim)
       case _ => any(ant, game)
     }
+
+  def orNone(ant: MyAnt, game: Game, aim: Option[CardinalPoint]): Option[CardinalPoint] =
+    aim flatMap { a =>
+      if (game choices ant contains a) Some(a) else None
+    }
 }
 
 case class Explore() extends Job {
 
-  def valid(game: Game) = false
+  def valid(ant: MyAnt, game: Game) = false
 
   //def aim(ant: MyAnt, game: Game) = any(ant, game)
   def aim(ant: MyAnt, game: Game) = {
@@ -34,9 +39,12 @@ case class Explore() extends Job {
 trait Goto extends Job {
 
   def aim(ant: MyAnt, game: Game) = {
-    val aim = new PathFinder(game.world, game.board.water.keySet).search(ant, target) map { _.aims.head }
+    val aim = path(ant, target, game) map { _.aims.head }
     orAny(ant, game, aim)
   }
+
+  def path(ant: MyAnt, target: Tile, game: Game): Option[Path] =
+    new PathFinder(game.world, game.board.water.keySet).search(ant, target)
 
   def target: Tile
 
@@ -46,16 +54,19 @@ trait Goto extends Job {
 case class GetFood(target: Tile) extends Goto {
 
   //def valid(game: Game) = game.board.food contains target
-  def valid(game: Game) = false
+  def valid(ant: MyAnt, game: Game) = false
 
   override def toString = "Food(%s)" format super.toString
 }
 
-case class Patrol(sector: Sector) extends Goto {
+case class Patrol(sector: Sector, fullPath: Path) extends Goto {
 
-  def valid(game: Game) = true
+  def valid(ant: MyAnt, game: Game) = (game.repartition sectorOf ant) != Some(sector)
 
   override def target = sector.center
+
+  override def aim(ant: MyAnt, game: Game) =
+    orAny(ant, game, fullPath aimFrom ant)
 
   override def toString = "Patrol(%s)" format super.toString
 }

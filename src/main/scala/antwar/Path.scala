@@ -6,6 +6,8 @@ sealed trait Path {
 
   def tiles: List[Tile]
 
+  def pathTiles = tiles.tail.init
+
   def aims: List[CardinalPoint]
 
   def from: Tile
@@ -17,6 +19,9 @@ sealed trait Path {
   def to: Tile = tiles.last
 
   def trip = tiles.tail.init
+
+  def aimFrom(tile: Tile): Option[CardinalPoint] =
+      aims.lift.apply(pathTiles indexOf tile)
 
   override def toString: String = aims mkString ", "
 

@@ -91,6 +91,6 @@ object Astar {
       , nodes.get(node.row +1, node.col)
       , nodes.get(node.row, node.col -1)
       , nodes.get(node.row, node.col +1)
-    ) filterNot (_.isEmpty) map (_.get)
+    ).flatten
   }
 }
