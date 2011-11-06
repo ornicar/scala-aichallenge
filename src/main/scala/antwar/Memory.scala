@@ -14,15 +14,14 @@ case class Memory(
     }
   }.toSet
 
-	def seeing(vision: Set[Tile]): Memory = copy(unseen = unseen -- vision)
+  // set the existing ants, potentially correcting the previous prediction
+	def update(vision: Set[Tile], ants: Set[MyAnt]): Memory = copy(
+    unseen = unseen -- vision,
+    antJobs = antJobs filter { ants contains _._1 }
+  )
 
   // set the next ants positions with their current job
   def withAntJobs(ajs: Map[MyAnt, Job]): Memory = copy(antJobs = ajs)
-
-  // set the existing ants, potentially correcting the previous prediction
-  def withAnts(ants: Set[MyAnt]): Memory = copy(
-    antJobs = antJobs filter { ants contains _._1 }
-  )
 }
 
 object Memory {

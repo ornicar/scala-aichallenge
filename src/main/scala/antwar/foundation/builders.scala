@@ -67,7 +67,7 @@ class GameBuilder(const: Const) extends Builder {
         (vRow, vCol) <- parameters.visionOffsets
       } yield Tile((aRow + vRow) % parameters.rows, (aCol + vCol) % parameters.cols)
     }.toSet
-    val newMemory = memory seeing vision withAnts board.myAnts.values.toSet
+    val newMemory = memory.update(vision, board.myAnts.values.toSet)
 
     Some(Game(turn, from.const, board, memory, vision))
   }
