@@ -1,5 +1,6 @@
 package antwar
 
+import foundation.Logger
 import scala.math
 import scala.collection.mutable.PriorityQueue
 
@@ -15,6 +16,8 @@ object Astar {
   type Heuristic = (Pos, Pos) => Int
 
   def search(world: W, s: Pos, e: Pos, heuristic: Heuristic = manhattan): List[Pos] = {
+
+    Logger.info(render(world, s, e))
 
     val nodes = world map { case (pos, wall) => (pos, new Node(pos, wall)) }
     val graph = new Graph(nodes.toMap)
@@ -93,4 +96,15 @@ object Astar {
       , nodes.get(node.row, node.col +1)
     ).flatten
   }
+
+  def render(world: W, s: Pos, e: Pos, dist: Int = 20) =
+    (-dist to dist) map { row =>
+      (-dist to dist) map { col =>
+        (row, col) match {
+          case p if p == s => 'S'
+          case p if p == e => 'E'
+          case p => world get p map (if (_) '#' else '.') getOrElse ' '
+        }
+      }
+    } map (_ mkString " ") mkString "\n"
 }
