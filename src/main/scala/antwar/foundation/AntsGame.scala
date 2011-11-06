@@ -20,7 +20,7 @@ class AntsGame(in: InputStream = System.in, out: OutputStream = System.out) {
 
     val timer = Timer("setup")
     val setup = (new SetupBuilder)(parser.setup)
-    val builder = new GameBuilder(setup.parameters)
+    val builder = new GameBuilder(setup.const)
     writeGo
     timer.log()
 

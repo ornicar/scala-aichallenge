@@ -1,6 +1,7 @@
 package antwar.foundation
 
 import scala.math.{abs,min,pow,sqrt}
+import antwar.Repartition
 
 case class World(rows: Int, cols: Int) {
 
@@ -11,7 +12,11 @@ case class World(rows: Int, cols: Int) {
     } yield Tile(row, col)
   }.toList
 
+  val tileSet: Set[Tile] = tiles.toSet
+
   def distanceFrom(one: Tile, other: Tile): Int = {
+    assert(tileSet contains one)
+    assert(tileSet contains other)
     val dRow = abs(one.row - other.row)
     val dCol = abs(one.col - other.col)
     min(dRow, cols - dRow) + min(dCol, cols - dCol)

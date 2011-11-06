@@ -1,6 +1,7 @@
 package antwar.foundation
 
 import antwar.Memory
+import antwar.Repartition
 import scala.collection.mutable
 import scala.math.{sqrt, pow}
 
@@ -15,7 +16,7 @@ trait Builder {
     lines map (_.trim) map { _ span (' '!=) } map { case (k, v) => (k, v.trim) }
 }
 
-class GameBuilder(parameters: GameParameters) extends Builder {
+class GameBuilder(const: Const) extends Builder {
 
   val tileRegex = """(\d+)\s(\d+)""".r
   val ownRegex = """(\d+)\s(\d+)\s(\d+)""".r
@@ -25,12 +26,7 @@ class GameBuilder(parameters: GameParameters) extends Builder {
     if (lines.head == "end") return None
 
     var turn: Int = 0
-    val water = mutable.ListBuffer[Tile]()
-    val food = mutable.ListBuffer[Tile]()
-    val myAnts = mutable.ListBuffer[Tile]()
-    val enemyAnts = mutable.ListBuffer[Tile]()
-    val myHills = mutable.ListBuffer[Tile]()
-    val enemyHills = mutable.ListBuffer[Tile]()
+    val water, food, myAnts, enemyAnts, myHills, enemyHills = mutable.ListBuffer[Tile]()
 
     def tile(str: String): Tile = str match {
       case tileRegex(row, col) => Tile(row.toInt, col.toInt)
@@ -62,6 +58,7 @@ class GameBuilder(parameters: GameParameters) extends Builder {
       case ("d", x) => // TODO dead
     }
 
+    val parameters = const.parameters
     val allWater = water.toList ::: from.knownWater
     val board = Board(myAnts.toList, enemyAnts.toList, allWater, food.toList, myHills.toList, enemyHills.toList)
     val vision = {
@@ -72,7 +69,7 @@ class GameBuilder(parameters: GameParameters) extends Builder {
     }.toSet
     val newMemory = memory seeing vision withAnts board.myAnts.values.toSet
 
-    Some(Game(turn, from.parameters, board, memory, vision))
+    Some(Game(turn, from.const, board, memory, vision))
   }
 }
 
@@ -87,7 +84,10 @@ class SetupBuilder extends Builder {
     val parameters = GameParameters(m("loadtime"), m("turntime"), m("rows"), m("cols"), m.get("player_seed") getOrElse(42), m("turns"), m("viewradius2"), m("attackradius2"), m("spawnradius2"))
 
     val memory = Memory(tiles, Map.empty)
+    val world = World(m("rows"), m("cols"))
+    val repartition = Repartition(world, parameters.viewRadius)
+    val const = Const(parameters, world, repartition)
 
-    GameSetup(parameters, memory)
+    GameSetup(const, memory)
   }
 }

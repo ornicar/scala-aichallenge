@@ -11,10 +11,10 @@ import scala.collection.mutable.PriorityQueue
 object Astar {
 
   type Pos = (Int, Int)
-  type World = Map[Pos, Boolean]
+  type W = Map[Pos, Boolean]
   type Heuristic = (Pos, Pos) => Int
 
-  def search(world: World, s: Pos, e: Pos, heuristic: Heuristic = manhattan): List[Pos] = {
+  def search(world: W, s: Pos, e: Pos, heuristic: Heuristic = manhattan): List[Pos] = {
 
     val nodes = world map { case (pos, wall) => (pos, new Node(pos, wall)) }
     val graph = new Graph(nodes.toMap)

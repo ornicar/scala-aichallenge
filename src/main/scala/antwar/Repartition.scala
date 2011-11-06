@@ -24,29 +24,31 @@ case class Repartition(world: World, viewRadius: Int) {
 
   val sectors: Map[Tile, Sector] = {
 
-      val radius = sqrt(viewRadius).toInt
-      val rowStep = min(world.rows, world.rows.toFloat / (world.rows / radius))
-      val colStep = min(world.cols, world.cols.toFloat / (world.cols / radius))
-      val shifts = (List.fill(world.rows)(List(0, rowStep / 2))).flatten
+    val radius = sqrt(viewRadius).toInt
+    val rowStep = min(world.rows, world.rows.toFloat / (world.rows / radius))
+    val colStep = min(world.cols, world.cols.toFloat / (world.cols / radius))
+    val shifts = (List.fill(world.rows)(List(0, rowStep / 2))).flatten
 
-      val centers: List[Tile] = for {
+    val centers: List[Tile] = {
+      for {
         (row, index) <- (.0 until world.rows by rowStep).toList.zipWithIndex
         shift = shifts(index).toFloat
         col <- (shift until world.cols + shift by colStep).toList
-      } yield Tile(row.toInt, col.toInt)
+      } yield Tile(row.toInt % world.rows, col.toInt % world.cols)
+    }.distinct
 
-      val tilesClosestCenter: Map[Tile, Tile] = {
-        world.tiles map { tile =>
-          (tile, centers minBy { world.distanceFrom(_, tile) })
-        }
-      }.toMap
-
-      val centersArea: Map[Tile, Set[Tile]] =
-        tilesClosestCenter groupBy { _._2 } mapValues { _.keySet }
-
-      centersArea map {
-        case (center, tiles) => (center, Sector(center, tiles))
+    val tilesClosestCenter: Map[Tile, Tile] = {
+      world.tiles map { tile =>
+        (tile, centers minBy { world.distanceFrom(_, tile) })
       }
+    }.toMap
+
+    val centersArea: Map[Tile, Set[Tile]] =
+      tilesClosestCenter groupBy { _._2 } mapValues { _.keySet }
+
+    centersArea map {
+      case (center, tiles) => (center, Sector(center, tiles))
+    }
   }
 }
 

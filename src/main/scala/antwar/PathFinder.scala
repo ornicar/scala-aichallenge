@@ -5,7 +5,7 @@ import scala.math
 
 class PathFinder(world: World, water: Set[Tile]) {
 
-  val max = 16
+  val max = 12
 
   val rows = world.rows
   val cols = world.cols
@@ -19,19 +19,18 @@ class PathFinder(world: World, water: Set[Tile]) {
         case Nil => None
         case solution => Some(makePath(f.pos, solution))
       }
-      //Logger("path")("%s %s %s".format(f, t, somePath map (_.tiles)))
       somePath
     }
   }
 
   private def makePath(a: Astar.Pos, solution: List[Astar.Pos]) = {
     val tiles = solution map { pos =>
-      Tile((a._1 + pos._1) % rows, (a._2 + pos._2) % cols)
+      Tile((rows + a._1 + pos._1) % rows, (cols + a._2 + pos._2) % cols)
     }
     Path(world, Tile(a) :: tiles)
   }
 
-  private def makeWorldAround(a: Astar.Pos): Astar.World = {
+  private def makeWorldAround(a: Astar.Pos): Astar.W = {
     for {
       row <- -max to max
       col <- -max to max

@@ -6,6 +6,8 @@ object Logger {
 
   val enabled = true
 
+  def t(a: Any) = apply("test")(a)
+
   def info = apply("info")(_)
   def err  = apply("err!")(_)
 

@@ -1,33 +1,32 @@
 package antwar.foundation
 
-import antwar.Repartition
 import antwar.Sector
 import antwar.Memory
 import scala.math
 
 sealed trait GameLike {
-  val parameters: GameParameters
+  val const: Const
   val memory: Memory
   val knownWater: List[Tile]
 }
 
-case class GameSetup(parameters: GameParameters, memory: Memory) extends GameLike {
+case class GameSetup(const: Const, memory: Memory) extends GameLike {
 
   val knownWater: List[Tile] = Nil
 }
 
 case class Game(
   turn: Int,
-  parameters: GameParameters,
+  const: Const,
   board: Board,
   memory: Memory,
   vision: Set[Tile]) extends GameLike {
 
+  def parameters = const.parameters
+  def world = const.world
+  def repartition = const.repartition
+
   val knownWater: List[Tile] = board.water.keys.toList
-
-  val world = World(parameters.rows, parameters.cols)
-
-  val repartition: Repartition = Repartition(world, parameters.viewRadius)
 
   def tiles = world.tiles
 
