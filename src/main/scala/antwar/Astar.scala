@@ -23,13 +23,12 @@ object Astar {
     val graph = new Graph(nodes.toMap)
     val end = graph nodes e
 
-		var heap = new PriorityQueue[Node]()
-		heap enqueue graph.nodes(s)
+		val heap = new PriorityQueue[Node]() ~ (_ enqueue graph.nodes(s))
 
     while(heap.nonEmpty) {
 
       // Grab the lowest f(x) to process next. Heap keeps this sorted for us.
-      var node = heap.dequeue
+      val node = heap.dequeue
 
       // End case -- result has been found, return the traced path
       if (node == end) return path(node).reverse map (_.pos)
@@ -41,8 +40,8 @@ object Astar {
 
         // g score is the shortest distance from start to current node, we need to check if
         // the path we have arrived at this neighbor is the shortest one we have seen yet
-        var gScore = node.g + 1
-        var beenVisited = neighbor.visited
+        val gScore = node.g + 1
+        val beenVisited = neighbor.visited
 
         if(!beenVisited || gScore < neighbor.g) {
           // Found an optimal (so far) path to this node. Take score for node to see how good it is.
