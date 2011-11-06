@@ -17,8 +17,6 @@ object Astar {
 
   def search(world: W, s: Pos, e: Pos, heuristic: Heuristic = manhattan): List[Pos] = {
 
-    Logger.info(render(world, s, e))
-
     val nodes = world map { case (pos, wall) => (pos, new Node(pos, wall)) }
     val graph = new Graph(nodes.toMap)
     val end = graph nodes e
@@ -31,7 +29,11 @@ object Astar {
       val node = heap.dequeue
 
       // End case -- result has been found, return the traced path
-      if (node == end) return path(node).reverse map (_.pos)
+      if (node == end) {
+        val p = path(node).reverse map (_.pos)
+        //Logger.info(render(world, s, e, p))
+        return p
+      }
 
       // Normal case -- move node from open to closed, process each of its neighbors
       node.closed = true
@@ -96,12 +98,13 @@ object Astar {
     ).flatten
   }
 
-  def render(world: W, s: Pos, e: Pos, dist: Int = 20) =
+  def render(world: W, s: Pos, e: Pos, path: List[Pos] = Nil, dist: Int = 20) =
     (-dist to dist) map { row =>
       (-dist to dist) map { col =>
         (row, col) match {
           case p if p == s => 'S'
           case p if p == e => 'E'
+          case p if path contains p => 'o'
           case p => world get p map (if (_) '#' else '.') getOrElse ' '
         }
       }

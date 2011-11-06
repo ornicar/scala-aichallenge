@@ -30,7 +30,6 @@ sealed trait Path {
 
 final class TilePath(world: World, val tiles: List[Tile]) extends Path {
 
-  Logger("path")(tiles)
   assert(tiles forall world.tileSet.contains)
 
   def from = tiles.head

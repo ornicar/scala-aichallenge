@@ -62,4 +62,10 @@ class WorldTest extends FunSuite {
     assert(world.distanceFrom(Tile(5, 5), Tile(25, 25)) === 20)
     assert(world.distanceFrom(Tile(25, 25), Tile(5, 5)) === 20)
   }
+
+  test("example map real case") {
+    val world = World(43, 39)
+    assert(world.distanceFrom(Tile(32, 17), Tile(0, 17)) === 11)
+    assert(world.distanceFrom(Tile(32, 17), Tile(0, 15)) === 13)
+  }
 }

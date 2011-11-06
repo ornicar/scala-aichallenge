@@ -8,19 +8,15 @@ case class Repartition(world: World, viewRadius: Int) {
 
   lazy val centers: List[Tile] = sectors.keys.toList
 
-  def sectorOf(tile: Tile): Option[Sector] =
+  def sectorOf(tile: Tile): Sector = {
     sectors.values find { _ contains tile }
+  }.get
 
   // all sectors, the nearest from this tile first
   def nearestSectors(tile: Tile): List[Sector] =
     sectors.values.toList sortBy { s => world.distanceFrom(s.center, tile) }
 
   def isSectorCenter(tile: Tile) = centers contains tile
-
-  override def toString = {
-    val chars = world.tiles map { t => if (isSectorCenter(t)) 'x' else '.' }
-    ((chars grouped world.cols) map (_ mkString " ")) mkString "\n"
-  }
 
   val sectors: Map[Tile, Sector] = {
 
@@ -50,9 +46,26 @@ case class Repartition(world: World, viewRadius: Int) {
       case (center, tiles) => (center, Sector(center, tiles))
     }
   }
+
+  override def toString = {
+    (0 until world.rows) map { row =>
+      (0 until world.cols) map { col =>
+        val tile = Tile(row, col)
+        val sector = sectorOf(tile)
+        val sectorIndex = sectors.values.toSeq indexOf sector
+        tile match {
+          case p if centers contains p => '@'
+          case p if (sectorIndex % 3 == 0) => '+'
+          case p if (sectorIndex % 3 == 1) => 'o'
+          case p if (sectorIndex % 3 == 2) => '.'
+          case p => '!'
+        }
+      }
+    } map (_ mkString " ") mkString "\n"
+  }
 }
 
-case class Sector(center: Tile, tiles: Set[Tile] = Set.empty) extends Positionable {
+case class Sector(center: Tile, tiles: Set[Tile]) extends Positionable {
 
   val tile = center
 
