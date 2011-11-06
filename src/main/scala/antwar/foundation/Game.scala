@@ -2,6 +2,7 @@ package antwar.foundation
 
 import antwar.Sector
 import antwar.Memory
+import antwar.Repartition
 import scala.math
 
 sealed trait GameLike {
@@ -39,4 +40,23 @@ case class Game(
 
   def sectorOccupation(sector: Sector) =
     board.myAnts.values count { sector.tiles contains _ }
+}
+
+object Game {
+
+  def dummy(board: Board, rows: Int, cols: Int) = {
+
+    val parameters = GameParameters.dummy(rows = rows, cols = cols)
+    val world = World(rows, cols)
+    val repartition = Repartition(world, parameters.viewRadius)
+    val const = Const(parameters, world, repartition)
+
+    Game(
+      turn = 42,
+      board = board,
+      const = const,
+      memory = Memory.dummy,
+      vision = Set()
+    )
+  }
 }
