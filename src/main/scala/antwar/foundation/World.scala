@@ -19,7 +19,7 @@ case class World(rows: Int, cols: Int) {
     assert(tileSet contains other)
     val dRow = abs(one.row - other.row)
     val dCol = abs(one.col - other.col)
-    min(dRow, cols - dRow) + min(dCol, cols - dCol)
+    min(dRow, rows - dRow) + min(dCol, cols - dCol)
   }
 
   def flyDistanceFrom(one: Tile, other: Tile): Double = {
