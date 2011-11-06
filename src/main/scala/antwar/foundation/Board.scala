@@ -6,7 +6,8 @@ case class Board(myAnts: mutable.Map[Tile, MyAnt],
                  enemyAnts: Map[Tile, EnemyAnt],
                  water: Map[Tile, Water],
                  food: Map[Tile, Food],
-                 hives: Map[Tile, Hive]) {
+                 myHills: Map[Tile, MyHill],
+                 enemyHills: Map[Tile, EnemyHill]) {
 
   lazy val elements = myAnts ++ enemyAnts ++ water ++ food
 
@@ -26,13 +27,15 @@ object Board {
             enemyAnts: List[Tile],
             water: List[Tile],
             food: List[Tile],
-            hives: List[Tile]): Board = {
+            myHills: List[Tile],
+            enemyHills: List[Tile]): Board = {
 
     Board(toMutableMap(toMap(myAnts, t => MyAnt(t))),
           toMap(enemyAnts, t => EnemyAnt(t)),
           toMap(water, t => Water(t)),
           toMap(food, t => Food(t)),
-          toMap(hives, t => Hive(t)))
+          toMap(myHills, t => MyHill(t)),
+          toMap(enemyHills, t => EnemyHill(t)))
   }
 
   private def toMap[A <: Positionable](tiles: List[Tile], builder: Tile => A) =

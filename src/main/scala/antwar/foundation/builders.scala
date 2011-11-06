@@ -29,7 +29,8 @@ class GameBuilder(parameters: GameParameters) extends Builder {
     val food = mutable.ListBuffer[Tile]()
     val myAnts = mutable.ListBuffer[Tile]()
     val enemyAnts = mutable.ListBuffer[Tile]()
-    val hives = mutable.ListBuffer[Tile]()
+    val myHills = mutable.ListBuffer[Tile]()
+    val enemyHills = mutable.ListBuffer[Tile]()
 
     def tile(str: String): Tile = str match {
       case tileRegex(row, col) => Tile(row.toInt, col.toInt)
@@ -42,10 +43,10 @@ class GameBuilder(parameters: GameParameters) extends Builder {
       }
     }
 
-    def hive(str: String): Option[Tile] = str match {
+    def hill(str: String): Either[Tile, Tile] = str match {
       case ownRegex(row, col, player) => player.toInt match {
-        case 0 => None
-        case _ => Some(Tile(row.toInt, col.toInt))
+        case 0 => Left(Tile(row.toInt, col.toInt))
+        case _ => Right(Tile(row.toInt, col.toInt))
       }
     }
 
@@ -57,12 +58,12 @@ class GameBuilder(parameters: GameParameters) extends Builder {
         case Left(a) => myAnts += a
         case Right(a) => enemyAnts += a
       }
-      case ("h", x) => hive(x) map { hives += _ }
+      case ("h", x) => hill(x).fold(myHills += _, enemyHills += _)
       case ("d", x) => // TODO dead
     }
 
     val allWater = water.toList ::: from.knownWater
-    val board = Board(myAnts.toList, enemyAnts.toList, allWater, food.toList, hives.toList)
+    val board = Board(myAnts.toList, enemyAnts.toList, allWater, food.toList, myHills.toList, enemyHills.toList)
     val vision = {
       for {
         Tile(aRow, aCol) <- board.myAnts.keys
