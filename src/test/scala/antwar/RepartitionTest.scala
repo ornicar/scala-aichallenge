@@ -12,10 +12,10 @@ class RepartitionTest extends FunSuite {
 
   test("Find wich sector a tile belongs to") {
 
-    assert(Some(Tile(0,0)) === (repartition sectorOf Tile(0,0) map (_.tile)))
-    assert(Some(Tile(0,0)) === (repartition sectorOf Tile(2,2) map (_.tile)))
-    assert(Some(Tile(7,3)) === (repartition sectorOf Tile(6,2) map (_.tile)))
-    assert(Some(Tile(0,0)) === (repartition sectorOf Tile(28, 33) map (_.tile)))
+    assert(Tile(0,0) === (repartition sectorOf Tile(0,0)).tile)
+    assert(Tile(0,0) === (repartition sectorOf Tile(2,2)).tile)
+    assert(Tile(7,3) === (repartition sectorOf Tile(6,2)).tile)
+    assert(Tile(0,0) === (repartition sectorOf Tile(28, 33)).tile)
   }
 
   test("Find nearest sectors") {

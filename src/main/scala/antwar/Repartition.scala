@@ -47,19 +47,18 @@ case class Repartition(world: World, viewRadius: Int) {
     }
   }
 
-  override def toString = {
+  override def toString = showingTileAs {
+    case p if centers contains p => 'x'
+    case _ => '.'
+  }
+
+  private def showingTileAs(tileToChar: Tile => Char) = {
     (0 until world.rows) map { row =>
       (0 until world.cols) map { col =>
         val tile = Tile(row, col)
         val sector = sectorOf(tile)
         val sectorIndex = sectors.values.toSeq indexOf sector
-        tile match {
-          case p if centers contains p => '@'
-          case p if (sectorIndex % 3 == 0) => '+'
-          case p if (sectorIndex % 3 == 1) => 'o'
-          case p if (sectorIndex % 3 == 2) => '.'
-          case p => '!'
-        }
+        tileToChar(tile)
       }
     } map (_ mkString " ") mkString "\n"
   }
