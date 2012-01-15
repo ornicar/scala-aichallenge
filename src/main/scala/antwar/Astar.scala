@@ -31,7 +31,6 @@ object Astar {
       // End case -- result has been found, return the traced path
       if (node == end) {
         val p = path(node).reverse map (_.pos)
-        //Logger.info(render(world, s, e, p))
         return p
       }
 

@@ -17,7 +17,17 @@ class Assigner(game: Game) {
 
   def distribute: List[Assignement] = {
 
-    val feeders: Set[Assignement] = electFeeders(ants, foods)
+    val persistentFeeders = game.memory.antJobs collect {
+      case (ant, job: GetFood) => Assignement(ant, job)
+    } toSet
+
+    val freeFoods = foods -- game.memory.antJobs collect {
+      case (ant, job: GetFood) => job
+    } toSet
+
+
+    val feeders: Set[Assignement] =
+      persistentFeeders ++ electFeeders(ants -- persistentFeeders, foods)
 
     val persistents: Set[Assignement] = {
       for {
@@ -32,6 +42,7 @@ class Assigner(game: Game) {
       game.repartition)
 
     Logger(this.getClass)("%d foods, %d ants, %d feeders, %d persistents, %d patrollers".format(foods.size, ants.size, feeders.size, persistents.size, patrollers.size))
+    Logger("feeders")(feeders)
     Logger("persistents")(persistents)
 
     val targets = ((patrollers ++ persistents) map { _.job match {

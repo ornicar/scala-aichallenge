@@ -38,9 +38,7 @@ class GoalAssigner[Ant] {
       case ant :: rest => cost(rest, dists.tail) + pow((ant map dists.head getOrElse max).toInt, 2).toInt
     }
 
-    val solution = solutions minBy { cost(_, goalsAntsDist) }
-
-    solution
+    solutions minBy { cost(_, goalsAntsDist) }
   }
 
 }
